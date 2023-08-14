@@ -86,6 +86,8 @@ export default function Editor({dev = false}) {
     let thumbnailSource = {
       "output_format": "jpg",
       "snapshot_time": 0,
+      "width": 50,
+      "height": 50,
       "elements": [
         {
           "type": "video",
