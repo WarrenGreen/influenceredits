@@ -24,7 +24,7 @@ export default function RenderModal({source}) {
           <Flex direction="column" justify="center" align="center" >
             {videoUrl ? 
             <>
-              <video width="90%" src={videoUrl}></video>
+              <video controls width="90%" src={videoUrl}></video>
               <a target="_blank" href={videoUrl}>Render Link</a>
             </>
             :

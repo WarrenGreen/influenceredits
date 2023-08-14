@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import TextBlock from '../components/TextBlock'
 import VideoBlock from '../components/VideoBlock'
 import Timeline from '../components/timeline/Timeline'
-import {finishVideo} from '../helpers/finishVideo'
+import {requestThumbnail} from '../helpers/finishVideo'
 import Layout from '../components/Layout'
 import { requestTranscription, defaultWords, defaultVideos, VideoComponent } from '../helpers/utils'
 
@@ -93,7 +93,7 @@ export default function Editor({dev = false}) {
         }
       ]
     }
-    finishVideo(thumbnailSource).then((data) => {
+    requestThumbnail(thumbnailSource).then((data) => {
       setVideos((oldVideos) => 
         oldVideos.map(currentVideo => {
           if (currentVideo.id == video.id) {
