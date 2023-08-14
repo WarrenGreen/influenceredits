@@ -23,7 +23,7 @@ export default function VideoBlock({ video, selected }) {
       }
       <div style={{"margin": "10px", overflow: "hidden"}}>
         <div style={{"fontWeight": "bold", whiteSpace: "nowrap"}}>{video.name}</div>
-        <div>time</div>
+        <div></div>
       </div>  
     </div>
   )
