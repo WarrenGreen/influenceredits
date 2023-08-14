@@ -1,0 +1,29 @@
+.wrapper{
+  display: flex;
+  align-items: center;
+  column-gap: 5rem;
+  margin-left: 3.5rem;
+  margin-right: 3.5rem;
+  height: 3.5ream;
+  top:0;
+  left:0;
+  right:0;
+}
+
+.graphicsWrapper{
+  display: flex;
+  flex-grow: 8;
+  align-items: center;
+  column-gap: 10px;
+  margin-left: 3.5rem;
+  margin-right: 3.5rem;
+  height:3.5rem;
+}
+.divider{
+  flex-grow: 1;
+  border-bottom: 2px solid var(--accent-9);
+}
+
+.element{
+  width: 120px;
+}

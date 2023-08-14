@@ -5,7 +5,7 @@ export default function PreviewModal({source}) {
   return (
     <Dialog.Root>
       <Dialog.Trigger>
-        <Button>Preview Video</Button>
+        <Button style={{borderRadius: "0px"}}>Preview Video</Button>
       </Dialog.Trigger>
 
       <Dialog.Content style={{ maxWidth: 450 }}>

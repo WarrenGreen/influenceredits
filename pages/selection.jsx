@@ -6,6 +6,7 @@ import {requestThumbnail} from '../helpers/finishVideo'
 import Layout from '../components/Layout'
 import { requestTranscription, defaultWords, defaultVideos, VideoComponent } from '../helpers/utils'
 
+import ProcessStatus from '@/components/process_status/ProcessStatus'
 import PreviewModal from '@/components/PreviewModal'
 import RenderModal from '@/components/RenderModal'
 import { Flex, Button } from '@radix-ui/themes';
@@ -16,7 +17,7 @@ import MyPreview from '@/components/MyPreview'
 import {Oval} from 'react-loader-spinner';
 
 
-export default function Editor({dev = false}) {
+export default function Editor({dev = true}) {
   let wordsDefault = []
   let videosDefault = []
   let playerRef = useRef();
@@ -158,6 +159,7 @@ export default function Editor({dev = false}) {
   return (
     <>
     <Layout>
+      <ProcessStatus style={{top:"0", height: "3.5rem"}} />
     <Flex direction="row" position="fixed" style={{top:"3.5rem", bottom:"3.5rem"}} width="100%">
       <div className="sidebar"> 
         {currentVideo != null ? <video controls ref={playerRef} src={dev?defaultVideos[0].url:null} width="100%"></video> :<div style={{height:"250px", width: "100%", backgroundColor:"gray"}}></div>}

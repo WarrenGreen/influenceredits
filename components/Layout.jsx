@@ -7,7 +7,7 @@ export default function Layout ({children}) {
       <Head>
         <title>influencer edits</title>
       </Head>
-      <Theme accentColor="violet" radius="none">
+      <Theme accentColor="violet">
       {children}
       </Theme>
     </>

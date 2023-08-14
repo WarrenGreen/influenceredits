@@ -1,3 +1,4 @@
+@import '@radix-ui/colors/gray-dark.css';
 
 header {
     position: fixed;
@@ -42,7 +43,7 @@ header {
   }
   
   .content-loaded {
-    min-width: 75%;
+    flex-grow:1;
     display:flex;
     overflow-y: scroll;
     padding: 20px;
@@ -52,7 +53,7 @@ header {
   }
 
   .content-loading {
-      min-width: 75%;
+      flex-grow:1;
       align-items: center;
       display: flex;
       justify-content: center;
@@ -100,27 +101,8 @@ header {
   overflow:hidden;
   margin: 0
   }
-  .loader {
-      width: 48px;
-      height: 48px;
-      border: 5px solid #FFF;
-      border-bottom-color: transparent;
-      border-radius: 50%;
-      display: inline-block;
-      box-sizing: border-box;
-      animation: rotation 1s linear infinite;
-      }
   
-      @keyframes rotation {
-      0% {
-          transform: rotate(0deg);
-      }
-      100% {
-          transform: rotate(360deg);
-      }
-      } 
-  
-  
+
 .video-block {
   height: 75px;
   border-top: gray 1px solid;

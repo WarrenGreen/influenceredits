@@ -16,7 +16,7 @@ export default function RenderModal({source}) {
   return (
     <Dialog.Root>
       <Dialog.Trigger>
-        <Button onClick={renderVideo}>Render Video</Button>
+        <Button style={{borderRadius: "0px"}}onClick={renderVideo}>Render Video</Button>
       </Dialog.Trigger>
 
       <Dialog.Content style={{ maxWidth: 450 }}>

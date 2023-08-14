@@ -83,7 +83,7 @@ export default function UploadVideo({uploadStartedCallback, uploadFinishedCallba
   }, [file]);
   return (
     <div className="">
-      <Button style={{textAlign:"center", width:"100%"}}>
+      <Button style={{textAlign:"center", width:"100%", borderRadius: "0px"}}>
         <label htmlFor="files">Add New Video</label>
         <input id="files" onChange={handleFileChange}  style={{display:"none"}} accept="video/*" type="file"/>
       </Button>
