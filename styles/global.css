@@ -1,0 +1,131 @@
+
+header {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 3.5rem;
+  }
+  
+  .my-settings {
+    --cfg-pubkey: 'af2bd40cf9274fb845e6';
+    /* all available settings https://uploadcare.github.io/blocks/solutions/file-uploader/#configuration */
+  }
+  
+  .my-config {
+    --darkmode: 0;
+    --h-accent: 274;
+    --s-accent: 100%;
+    --l-accent: 61%;
+  }
+  
+  .main {
+    position: absolute;
+    top: 3.5rem;
+    bottom: 3.5rem;
+    width:100%;
+  }
+  
+  .sidebar {
+    min-width:25%;
+    width: 25%;
+    border:#C8C8C8 1px solid;
+    display: flex;
+    flex-direction: column;
+  }
+  .add-video-btn {
+    display: flex;
+      background-color: #BEADFA;
+      padding: 5px;
+      cursor: pointer;
+      justify-content: center;
+  }
+  
+  .content-loaded {
+    min-width: 75%;
+    display:flex;
+    overflow-y: scroll;
+    padding: 20px;
+    flex-wrap: wrap;
+    border:#C8C8C8 1px solid;
+    align-content: flex-start;
+  }
+
+  .content-loading {
+      min-width: 75%;
+      align-items: center;
+      display: flex;
+      justify-content: center;
+  }
+  
+  .video-set {
+    overflow-y: scroll;
+  }
+  
+  .dashed-line {
+    z-index: 0;
+    border-top-color:#C8C8C8;
+    border-top-width: 4px;
+    border-top-style: dashed;
+    width:100%
+  }
+  
+  ::-moz-selection { /* Code for Firefox */
+    color: black;
+    background: transparent;
+  
+  }
+  
+  .inner-span::selection {
+    color: black;
+    background: transparent;
+  }
+  
+  span {
+    font: 18px Inter Tight;
+    padding: .5rem;
+    cursor: pointer;
+  }
+  
+  .inner-span {
+    padding: 0px;
+  }
+  
+  .inner-span:hover {
+    border-bottom: 5px solid #3b82f6;
+  }
+  
+  html body{
+  height:100%;
+  overflow:hidden;
+  margin: 0
+  }
+  .loader {
+      width: 48px;
+      height: 48px;
+      border: 5px solid #FFF;
+      border-bottom-color: transparent;
+      border-radius: 50%;
+      display: inline-block;
+      box-sizing: border-box;
+      animation: rotation 1s linear infinite;
+      }
+  
+      @keyframes rotation {
+      0% {
+          transform: rotate(0deg);
+      }
+      100% {
+          transform: rotate(360deg);
+      }
+      } 
+  
+  
+.video-block {
+  height: 75px;
+  border-top: gray 1px solid;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+}
