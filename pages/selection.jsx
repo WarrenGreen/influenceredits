@@ -17,7 +17,7 @@ import MyPreview from '@/components/MyPreview'
 import {Oval} from 'react-loader-spinner';
 
 
-export default function Editor({dev = true}) {
+export default function Editor({dev = false}) {
   let wordsDefault = []
   let videosDefault = []
   let playerRef = useRef();
