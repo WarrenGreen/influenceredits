@@ -4,10 +4,13 @@ import SortableList, { SortableItem } from 'react-easy-sort'
 import {arrayMoveImmutable} from 'array-move'
 
 
-export default function Timeline({ segments, setSegments}) {
-    let videoDuration = 47;
+export default function Timeline({ segments, setSegments, totalWords }) {
     const onSortEnd = (oldIndex, newIndex) => {
       setSegments((array) => arrayMoveImmutable(array, oldIndex, newIndex))
+    }
+
+    const scale = (text) => {
+      return Math.max(100, text.split(" ").length / totalWords *500)+"px";
     }
     return (
       <>
@@ -16,7 +19,7 @@ export default function Timeline({ segments, setSegments}) {
               { 
                 segments.map((segment, i) =>  (
                   <SortableItem key={segment.id}>
-                    <div style={{backgroundColor: segment.color, width:"100px"}} className={styles.segment}>
+                    <div style={{backgroundColor: segment.color, width:scale(segment.text)}} className={styles.segment}>
                       <div className={styles.segment_meat}>{ segment.text }</div>
                     </div>
                   </SortableItem>

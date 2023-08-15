@@ -48,154 +48,45 @@ export default function TextBlock({words, seekVideo, segments, setSegments}) {
     }
   }
 
-  const selectedCallback = (id) => {
-    setWordsState(oldWordState => {
-      return oldWordState.map(wordState => {
-        if (wordState.id == id) {
-          return {...wordState, selected: true};
-        }else{
-          return {...wordState};
-        }
-      })
-    });
-  }
-
-  const selectedStartCallback = (id) => {
-    setWordsState(oldWordState => {
-      return oldWordState.map(wordState => {
-        if (wordState.id == id) {
-          return {...wordState, selectedStart: true};
-        }else{
-          return {...wordState};
-        }
-      })
-    });
-  }
-
-  const selectedEndCallback = (id) => {
-    setWordsState(oldWordState => {
-      return oldWordState.map(wordState => {
-        if (wordState.id == id) {
-          return {...wordState, selectedEnd: true};
-        }else{
-          return {...wordState};
-        }
-      })
-    });
-  }
-
-
-  let dismissMouseUp = 0;
-
-  let doucleckicked = false;
-
-  const mouseEvent = () => {
-    
-    setWordsState(oldWordState => {
-      return oldWordState.map((wordState) => {
-        return {...wordState, selected:false, selectedEnd:false, selectedStart: false }
-      })
-    })
-
-    let t = '';
-
-    if (window.getSelection) {
-      t = window.getSelection().toString();
-    } else if (document.getSelection() && document.getSelection().type !== 'Control') {
-      t = document.createRange().toString();
-    }
-
-    if(!t || !t.length) {
-      return false;
-    }
-
-    const r = window.getSelection().getRangeAt(0);
-    const tokenEvent = new Event("onSelected");
-    const startTokenEvent = new Event("onSelectedStart");
-    const endTokenEvent = new Event("onSelectedEnd");
-
-    r.startContainer.parentElement.parentElement.dispatchEvent(tokenEvent);
-    
-    var _iterator = document.createNodeIterator(
-      r.commonAncestorContainer,
-      NodeFilter.SHOW_ALL, // pre-filter
-      {
-          // custom filter
-          acceptNode: function (node) {
-            return NodeFilter.FILTER_ACCEPT;
-          }
-      }
-  );
-  
-  var _nodes = [];
-  while (_iterator.nextNode()) {
-      if (_nodes.length === 0 && _iterator.referenceNode !== r.startContainer) continue;
-      _nodes.push(_iterator.referenceNode);
-      if (_iterator.referenceNode === r.endContainer) break;
-  }
-
-    for (let childIndex in _nodes) {
-      let child = _nodes[childIndex];
-      if (child && child.tagName && child.tagName.toLowerCase() == "span"){
-        child.dispatchEvent(tokenEvent)
-      } 
-    }
-
-    r.startContainer.parentNode.parentNode.dispatchEvent(startTokenEvent);
-    r.endContainer.parentNode.parentNode.dispatchEvent(endTokenEvent);
-  };
-
-
-
   const mouseCement = () => {
-    let text = "";
-    let lastMin = null;
-    let lastMax = null;
     let chosenColor = getColor();
-    for (let index in wordsState) {
-      if (wordsState[index].selected == true) {
-        lastMin = lastMin && lastMin < index ? lastMin : index;
-        lastMax = lastMax && lastMax > index ? lastMax : index;
-        if (text == ""){
-          text += wordsState[index].text;
-        }else {
-          text += " " + wordsState[index].text;
-        }
-        setWordsState(oldWordState => {
-          return oldWordState.map(state => {
-            if (state.index == index) {
-              return {...state, rangeColor:chosenColor, rangeStart:false, rangeEnd:false}
-            }
-            else{
-              return {...state}
-            }
-          })
-        })
-      }
+
+    let start = null;
+    let end = null;
+    let startNum = parseInt(startIndex);
+    let currentNum = parseInt(endIndex);
+    if (startNum <= currentNum){
+      start = startNum;
+      end=currentNum;
+    }else{
+      start=currentNum;
+      end = startNum;
     }
 
-    if (lastMin == null || lastMax == null){
-      return;
+    let text = "";
+    for (let index in wordsState) {
+      if (wordsState[index].index == start) text += wordsState[index].text
+      if (start <= wordsState[index].index && wordsState[index].index <= end) text += " " + wordsState[index].text;
     }
 
 
     setWordsState(oldWordState => {
       return oldWordState.map(state => {
-        if (state.index == lastMin && state.index == lastMax) {
-          return {...state, rangeStart:true, rangeEnd:true}
+        if (state.index == start && state.index == end) {
+          return {...state, rangeColor: chosenColor, rangeStart:true, rangeEnd:true}
+        } else if (state.index == end) {
+          return {...state, rangeColor: chosenColor, rangeStart:false, rangeEnd: true}
+        } else if (state.index == start) {
+          return {...state, rangeColor: chosenColor, rangeStart: true, rangeEnd:false}
+        } else if (start <= state.index && state.index <= end){
+          return {...state, rangeColor: chosenColor, rangeStart: false, rangeEnd:false}
+        } else {
+          return {...state};
         }
-        if (state.index == lastMin) {
-          return {...state, rangeStart:true}
-        }
-        if (state.index == lastMax) {
-          return {...state, rangeEnd:true}
-        }
-        return {...state}
       })
     })
 
-    console.log(lastMin);
-    let range = {"id": uuid(), "timeStart": wordsState[lastMin].videoStart, "timeEnd": wordsState[lastMax].videoEnd, "start": parseInt(lastMin), "end": parseInt(lastMax), "color": chosenColor, "text": text};
+    let range = {"id": uuid(), "timeStart": wordsState[end].videoStart, "timeEnd": wordsState[start].videoEnd, "start": start, "end": end, "color": chosenColor, "text": text};
     setSegments(oldRange => [...oldRange, range]);
  
 
@@ -204,36 +95,56 @@ export default function TextBlock({words, seekVideo, segments, setSegments}) {
         return {...wordState, selected:false, selectedEnd:false, selectedStart: false }
       })
     })
-
-    window.getSelection().empty();
-
   };
 
-  const preMouseEvent = (fn) => {
-    debounce(() => {
-      if (doucleckicked) {
-        doucleckicked = false;
-        dismissMouseUp++;
-      } else if(dismissMouseUp > 0) {
-        dismissMouseUp--;
-      } else {
-        fn();
+  let [inSelection , setInSelection]= useState(false);
+  let [startIndex, setStartIndex] = useState(null);
+  let [endIndex, setEndIndex] = useState(null);
+  const onMouseDown = (wordIndex) => {
+    setInSelection(true);
+    setStartIndex(wordIndex);
+  }
+
+  const onMouseUp = (wordId) => {
+    setInSelection(false);
+    mouseCement();
+  }
+
+  const onMouseOver = (wordIndex) => {
+
+      if (inSelection) {
+        setEndIndex(wordIndex);
+        if (startIndex == null) return;
+
+        let start = null;
+        let end = null;
+        let startNum = parseInt(startIndex);
+        let currentNum = parseInt(wordIndex);
+        if (startNum <= currentNum){
+          start = startNum;
+          end=currentNum;
+        }else{
+          start=currentNum;
+          end = startNum;
+        }
+  
+          setWordsState(oldWordState => {
+            return oldWordState.map(state => {
+              if (state.index == start && state.index == end) {
+                return {...state, selected: true, selectedStart:true, selectedEnd:true}
+              } else if (state.index == end) {
+                return {...state, selected: true, selectedStart:false, selectedEnd: true}
+              } else if (state.index == start) {
+                return {...state, selected: true, selectedStart: true, selectedEnd:false}
+              } else if (start <= state.index && state.index <= end){
+                return {...state, selected: true, selectedStart: false, selectedEnd:false}
+              } else {
+                return {...state};
+              }
+            })
+          })
       }
-    }, 200)();
   }
-
-  const onMouseMove = () => {
-    preMouseEvent(mouseEvent)
-  };
-
-  const onMouseUp = () => {
-    preMouseEvent(mouseCement)
-  }
-
-  const onDoubleClick = () => {
-    doucleckicked = true;
-    mouseEvent();
-  };
 
   const seekVideoWrapper = (wordId) => {
     for (let index in wordsState) {
@@ -245,15 +156,16 @@ export default function TextBlock({words, seekVideo, segments, setSegments}) {
   }
 
   return (
-    <div onMouseUp={onMouseUp} onMouseMove={onMouseMove} onDoubleClick={onDoubleClick} className="content-loaded">
-      {wordsState.map((state)=> <Word 
-      key={state.id}
-      state={state}
-      selectedCallback={selectedCallback}
-      selectedStartCallback={selectedStartCallback}
-      selectedEndCallback={selectedEndCallback}
-      seekVideo={seekVideoWrapper}
-    />) }
+    <div  onMouseUp={onMouseUp} className="content-loaded">
+      {wordsState.map((state)=> 
+        <Word 
+          onMouseDown={() => onMouseDown(state.index)}
+          onMouseOver={() => onMouseOver(state.index)}
+          key={state.id}
+          state={state}
+          seekVideo={seekVideoWrapper}
+      />
+      )}
     </div>
   )
 }

@@ -8,33 +8,6 @@ class Word extends Component{
     this.elementRef = React.createRef();
   }
 
-handleTokenEvent = event => {
-  this.props.selectedCallback(this.props.state.id)
-}
-
-
-handleStartTokenEvent = event => {
-  this.props.selectedStartCallback(this.props.state.id)
-}
-
-handleEndTokenEvent = event => {
-  this.props.selectedEndCallback(this.props.state.id)
-}
-  
-componentDidMount() {
-  this.elementRef.current.addEventListener('onSelected', this.handleTokenEvent);
-  this.elementRef.current.addEventListener('onSelectedStart', this.handleStartTokenEvent);
-  this.elementRef.current.addEventListener('onSelectedEnd', this.handleEndTokenEvent);
-  this.elementRef.current.addEventListener('cemented', this.handleEndTokenEvent);
-}
-
-componentWillUnmount() {
-  this.elementRef.current.removeEventListener('onSelected', this.handleTokenEvent);
-  this.elementRef.current.removeEventListener('onSelectedStart', this.handleStartTokenEvent);
-  this.elementRef.current.removeEventListener('onSelectedEnd', this.handleEndTokenEvent);
-  this.elementRef.current.removeEventListener('cemented', this.handleCementEvent);
-}
-
 render() {
   let styleValues = {};
 
@@ -60,7 +33,17 @@ render() {
 
 
   return (
-    <span ref={this.elementRef} onClick={() => {this.props.seekVideo(this.props.state.id)}} style={styleValues}><span className="inner-span">{this.props.state.text}</span></span>
+    <span 
+      onMouseOut={this.props.onMouseOut}
+      onMouseOver={this.props.onMouseOver}
+      onMouseDown={this.props.onMouseDown}
+      ref={this.elementRef}
+      onClick={() => {this.props.seekVideo(this.props.state.id)}}
+      style={styleValues}>
+        <span className="inner-span">
+          {this.props.state.text}
+        </span>
+    </span>
   )
 }
 }

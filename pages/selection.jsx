@@ -195,7 +195,7 @@ export default function Editor({dev = true}) {
       }
       
     </Flex>
-    <Timeline segments={segments} setSegments={setSegments}></Timeline>
+    <Timeline segments={segments} setSegments={setSegments} totalWords={words.length}></Timeline>
     </Layout>
   </>
       
