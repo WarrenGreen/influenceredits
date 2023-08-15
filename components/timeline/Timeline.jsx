@@ -14,8 +14,7 @@ export default function Timeline({ segments, setSegments, totalWords }) {
     }
     return (
       <>
-          <div className={styles.trackbar}>
-            <SortableList className={styles.inner_trackbar} onSortEnd={onSortEnd} draggedItemClassName="dragged">
+            <SortableList className={styles.trackbar} onSortEnd={onSortEnd} draggedItemClassName="dragged">
               { 
                 segments.map((segment, i) =>  (
                   <SortableItem key={segment.id}>
@@ -27,8 +26,6 @@ export default function Timeline({ segments, setSegments, totalWords }) {
                 )
               }
               </SortableList>
-
-          </div>
       </>
     )
 }

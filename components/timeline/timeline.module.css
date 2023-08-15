@@ -1,9 +1,3 @@
-.inner_trackbar {
-  align-items: center;
-  display: flex;
-  height: 100%;
-}
-
 .trackbar {
   position: fixed;
   bottom: 0;
@@ -13,7 +7,8 @@
   overflow-x: scroll;
   background-color:  #E0E0E0;
   display:flex;
-  align-items: center;
+  flex-direction: row;
+  align-items: stretch;
 }
 
 
@@ -24,11 +19,10 @@
   resize: horizontal;
   display: flex;
   cursor: pointer;
-  width: 100px;
-  overflow: hidden;
   white-space: nowrap;
+  padding: 10px;
 }
 
 .segment_meat {
-  padding: 5px;
+  overflow: hidden;
 }

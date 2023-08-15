@@ -66,7 +66,7 @@ export default function TextBlock({words, seekVideo, segments, setSegments}) {
     let text = "";
     for (let index in wordsState) {
       if (wordsState[index].index == start) text += wordsState[index].text
-      if (start <= wordsState[index].index && wordsState[index].index <= end) text += " " + wordsState[index].text;
+      else if (start <= wordsState[index].index && wordsState[index].index <= end) text += " " + wordsState[index].text;
     }
 
 
