@@ -21,7 +21,6 @@ export default function handler(req, res) {
       client
         .render(options)
         .then((renders) => {
-          console.log(renders)
           res.status(200).json(renders[0]);
           resolve();
         })

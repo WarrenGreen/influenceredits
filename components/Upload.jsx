@@ -3,7 +3,7 @@ import AWS from "aws-sdk";
 import { useEffect, useState } from "react";
 import {v4 as uuid} from 'uuid';
 
-import { Flex, Text, Button, Box } from '@radix-ui/themes';
+import {  Button } from '@radix-ui/themes';
 
 
 export default function UploadVideo({uploadStartedCallback, uploadFinishedCallback}) {
@@ -30,7 +30,8 @@ export default function UploadVideo({uploadStartedCallback, uploadFinishedCallba
     });
 
     let videoId = uuid();
-    let videoExtension = file.name.split(".")[1];
+    let splits = file.name.split(".")
+    let videoExtension = splits[splits.lenth-1];
     let storageName = videoId + "." + videoExtension;
 
     // Files Parameters
@@ -64,8 +65,6 @@ export default function UploadVideo({uploadStartedCallback, uploadFinishedCallba
 
     await upload.then((err, data) => {
       console.log(err);
-      console.log("done");
-      console.log(data);
       uploadFinishedCallback({...video, status: "uploaded"});
     });
   };

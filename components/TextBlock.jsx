@@ -48,6 +48,44 @@ export default function TextBlock({words, seekVideo, segments, setSegments}) {
     }
   }
 
+  const resetSelection = () => {
+    setWordsState(oldWordState => {
+      return oldWordState.map((wordState) => {
+        return {...wordState, selected:false, selectedEnd:false, selectedStart: false }
+      })
+    })
+  }
+
+  const paintRanges = () => {
+    setWordsState(oldWordState => {
+      return oldWordState.map(state => {
+          return {...state, rangeColor: null, rangeStart:false, rangeEnd:false}
+
+      })
+    });
+    segments.map((segment) => {
+      setWordsState(oldWordState => {
+        return oldWordState.map(state => {
+          if (state.index == segment.start && state.index == segment.end) {
+            return {...state, rangeColor: segment.color, rangeStart:true, rangeEnd:true}
+          } else if (state.index == segment.end) {
+            return {...state, rangeColor: segment.color, rangeStart:false, rangeEnd: true}
+          } else if (state.index == segment.start) {
+            return {...state, rangeColor: segment.color, rangeStart: true, rangeEnd:false}
+          } else if (segment.start <= state.index && state.index <= segment.end){
+            return {...state, rangeColor: segment.color, rangeStart: false, rangeEnd:false}
+          } else {
+            return {...state};
+          }
+        })
+      })
+    });
+  }
+
+  useEffect(() => {
+    paintRanges();
+  }, [segments])
+
   const mouseCement = () => {
     let chosenColor = getColor();
 
@@ -62,6 +100,13 @@ export default function TextBlock({words, seekVideo, segments, setSegments}) {
       start=currentNum;
       end = startNum;
     }
+    setStartIndex(null);
+    setEndIndex(null);
+
+
+    if (start == null || end == null || isNaN(start) || isNaN(end) ) { 
+      return;
+    }
 
     let text = "";
     for (let index in wordsState) {
@@ -69,50 +114,38 @@ export default function TextBlock({words, seekVideo, segments, setSegments}) {
       else if (start <= wordsState[index].index && wordsState[index].index <= end) text += " " + wordsState[index].text;
     }
 
-
-    setWordsState(oldWordState => {
-      return oldWordState.map(state => {
-        if (state.index == start && state.index == end) {
-          return {...state, rangeColor: chosenColor, rangeStart:true, rangeEnd:true}
-        } else if (state.index == end) {
-          return {...state, rangeColor: chosenColor, rangeStart:false, rangeEnd: true}
-        } else if (state.index == start) {
-          return {...state, rangeColor: chosenColor, rangeStart: true, rangeEnd:false}
-        } else if (start <= state.index && state.index <= end){
-          return {...state, rangeColor: chosenColor, rangeStart: false, rangeEnd:false}
-        } else {
-          return {...state};
-        }
-      })
-    })
-
-    let range = {"id": uuid(), "timeStart": wordsState[end].videoStart, "timeEnd": wordsState[start].videoEnd, "start": start, "end": end, "color": chosenColor, "text": text};
+    if (wordsState[end] == null) { console.log("FFUCK: "+end); console.log(wordsState[end])}
+    let range = {"id": uuid(), "timeStart": wordsState[start].videoStart, "timeEnd": wordsState[end].videoEnd, "start": start, "end": end, "color": chosenColor, "text": text};
     setSegments(oldRange => [...oldRange, range]);
- 
-
-    setWordsState(oldWordState => {
-      return oldWordState.map((wordState) => {
-        return {...wordState, selected:false, selectedEnd:false, selectedStart: false }
-      })
-    })
+    resetSelection();
+    
   };
 
-  let [inSelection , setInSelection]= useState(false);
   let [startIndex, setStartIndex] = useState(null);
   let [endIndex, setEndIndex] = useState(null);
   const onMouseDown = (wordIndex) => {
-    setInSelection(true);
     setStartIndex(wordIndex);
   }
 
   const onMouseUp = (wordId) => {
-    setInSelection(false);
     mouseCement();
   }
 
-  const onMouseOver = (wordIndex) => {
+  const onMouseMove = (event) => {
+    var flags = event.buttons !== undefined ? event.buttons : event.which;
+    let primaryMouseButtonDown = (flags & 1) === 1;
+    if (!primaryMouseButtonDown) {
+      resetSelection();
+    }
+  }
 
-      if (inSelection) {
+  const onMouseOver = (event, wordIndex) => {
+    resetSelection();
+
+    var flags = event.buttons !== undefined ? event.buttons : event.which;
+    let primaryMouseButtonDown = (flags & 1) === 1;
+
+      if (primaryMouseButtonDown ) {
         setEndIndex(wordIndex);
         if (startIndex == null) return;
 
@@ -143,7 +176,7 @@ export default function TextBlock({words, seekVideo, segments, setSegments}) {
               }
             })
           })
-      }
+      } 
   }
 
   const seekVideoWrapper = (wordId) => {
@@ -156,11 +189,11 @@ export default function TextBlock({words, seekVideo, segments, setSegments}) {
   }
 
   return (
-    <div  onMouseUp={onMouseUp} className="content-loaded">
+    <div  onMouseUp={onMouseUp} onMouseMove={onMouseMove} className="content-loaded">
       {wordsState.map((state)=> 
         <Word 
           onMouseDown={() => onMouseDown(state.index)}
-          onMouseOver={() => onMouseOver(state.index)}
+          onMouseOver={(event) => onMouseOver(event, state.index)}
           key={state.id}
           state={state}
           seekVideo={seekVideoWrapper}

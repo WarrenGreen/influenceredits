@@ -13,7 +13,6 @@
 
 
 .segment {
-  height: 3.5rem;
   background-color: red;
   border-radius: .25rem;
   resize: horizontal;

@@ -1,25 +1,37 @@
 import { useEffect, useRef, useState } from 'react'
-import TextBlock from '../components/TextBlock'
-import VideoBlock from '../components/VideoBlock'
-import Timeline from '../components/timeline/Timeline'
-import {requestThumbnail} from '../helpers/finishVideo'
-import Layout from '../components/Layout'
-import { requestTranscription, defaultWords, defaultVideos, VideoComponent } from '../helpers/utils'
+import TextBlock from '../../components/TextBlock'
+import VideoBlock from '../../components/VideoBlock'
+import Timeline from '../../components/timeline/Timeline'
+import {requestThumbnail} from '../../helpers/finishVideo'
+import Layout from '../../components/Layout'
+import { requestTranscription, defaultWords, defaultVideos, VideoComponent } from '../../helpers/utils'
+import { useRouter } from 'next/router'
+
+import {createMedia, getProjectMedia} from '@/helpers/media'
 
 import ProcessStatus from '@/components/process_status/ProcessStatus'
 import PreviewModal from '@/components/PreviewModal'
 import RenderModal from '@/components/RenderModal'
-import { Flex, Button } from '@radix-ui/themes';
-import styles from '../styles/selection.module.css'
-import UploadVideo from '../components/Upload'
+import { Flex } from '@radix-ui/themes';
+import UploadVideo from '../../components/Upload'
 import {v4 as uuid} from 'uuid';
-import MyPreview from '@/components/MyPreview'
 import {Oval} from 'react-loader-spinner';
 
 
-export default function Editor({dev = false}) {
+
+export const getServerSideProps = async ({ params }) => {
+  let projectVideos = await getProjectMedia(params.projectId)
+
+  return {
+    props: {projectVideos},
+  }
+  
+}
+
+export default function Editor({projectVideos, dev = false}) {
+  
   let wordsDefault = []
-  let videosDefault = []
+  let videosDefault = projectVideos;
   let playerRef = useRef();
   if (dev) {
     wordsDefault = defaultWords;
@@ -29,35 +41,53 @@ export default function Editor({dev = false}) {
   let [videos, setVideos] = useState(videosDefault);
   let [selectedVideo, setSelectedVideo] = useState(videos.length ==0? null: videos[0].id);
   const [segments, setSegments] = useState([]);
-  const defaultSource = {
+  const defaultSource = videosDefault.map((defaultVideo) => {
+    return {
     "output_format": "mp4",
     "width": 240,
     "height": 135,
     "elements": [
       {
-        "id": defaultVideos[0].id,
+        "id": defaultVideo.id,
         "type": "video",
         "track": 1,
         "trim_start": 0,
         "trim_duration":47,
-        "source": defaultVideos[0].url
+        "thumbnail":  defaultVideo.thumbnailUrl,
+        "source": defaultVideo.url
       },
     ]
   }
+});
   const [source, setSource] = useState(defaultSource);
 
 
   useEffect(() => {
     const newSource = {...defaultSource};
     newSource["elements"] = segments.map((segment) => {
-      const start = segment.timeStart / 1000;
-      const end = segment.timeEnd / 1000;
+      
+
+      let start = null;
+      let end = null;
+      let startNum = segment.timeStart / 1000;
+      let endNum = segment.timeEnd / 1000;
+      if (startNum <= endNum){
+        start = startNum;
+        end=endNum;
+      }else{
+        start=endNum;
+        end = startNum;
+      }
+
+      if (start == null || end == null) {
+        return {}
+      }
       return {
         "id": uuid(),
         "type": "video",
         "track": 1,
         "trim_start": Math.max(0, start),
-        "trim_duration":Math.max(0, end-start),
+        "trim_duration":Math.max(0, Math.abs(end-start)),
         "source": videos[0].url
       }
     })
@@ -87,8 +117,8 @@ export default function Editor({dev = false}) {
     let thumbnailSource = {
       "output_format": "jpg",
       "snapshot_time": 0,
-      "width": 50,
-      "height": 50,
+      "width": 150,
+      "height": 150,
       "elements": [
         {
           "type": "video",
@@ -96,17 +126,19 @@ export default function Editor({dev = false}) {
         }
       ]
     }
-    requestThumbnail(thumbnailSource).then((data) => {
+    requestThumbnail(thumbnailSource).then((thumbnailUrl) => {
       setVideos((oldVideos) => 
         oldVideos.map(currentVideo => {
           if (currentVideo.id == video.id) {
-            return {...currentVideo, thumbnail: data.url};
+            return {...currentVideo, thumbnail: thumbnailUrl.url};
           }else{
             return {...currentVideo};
           }
         })
       );
+      createMedia(video, thumbnailUrl.url, "e07b5aca-3cb1-11ee-9e28-232206fe9a57");
     });
+
 
     setSource({
       "output_format": "mp4",
@@ -137,7 +169,6 @@ export default function Editor({dev = false}) {
       setWords(transcribedWords);
         
       }
-      console.log("requested")
       request();
 
   }
@@ -162,7 +193,7 @@ export default function Editor({dev = false}) {
       <ProcessStatus style={{top:"0", height: "3.5rem"}} />
     <Flex direction="row" position="fixed" style={{top:"3.5rem", bottom:"3.5rem"}} width="100%">
       <div className="sidebar"> 
-        {currentVideo != null ? <video controls ref={playerRef} src={dev?defaultVideos[0].url:null} width="100%"></video> :<div style={{height:"250px", width: "100%", backgroundColor:"gray"}}></div>}
+        {currentVideo != null ? <video controls ref={playerRef} src={currentVideo? currentVideo.url: null} width="100%"></video> :<div style={{height:"250px", width: "100%", backgroundColor:"gray"}}></div>}
         <UploadVideo uploadStartedCallback={uploadStartedCallback} uploadFinishedCallback={uploadFinishedCallback} />
         <PreviewModal source={source}/>
         <RenderModal source={source} />

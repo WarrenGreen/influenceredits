@@ -9,7 +9,6 @@ export default function RenderModal({source}) {
   const renderVideo = () => {
     finishVideo(source)
     .then((data) => {
-      console.log(data);
       setVideoUrl(data.url);
     });
   }

@@ -55,6 +55,9 @@ export default function MyPreview ({source})  {
   useEffect(() => {
     if(isReady)
       previewRef.current.setSource(source);
+      console.log("preview: ");
+      console.log(source)
+
   }, [source])
     
 

@@ -1,8 +1,6 @@
-import axios from "axios";
-
 
 export async function requestThumbnail(source) {
-  const response = await fetch('/api/thumbnails', {
+  const response = await fetch('/api/thumbnail', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -26,7 +24,7 @@ export async function requestThumbnail(source) {
 
 
 export async function finishVideo(source) {
-  const response = await fetch('/api/videos', {
+  const response = await fetch('/api/render', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -37,7 +35,6 @@ export async function finishVideo(source) {
   });
 
   const data = await response.json();
-  console.log(data);
   const renderId = data.id
   const pollingEndpoint = `https://api.creatomate.com/v1/renders/${renderId}`
   const headers = {
@@ -50,9 +47,7 @@ while (true) {
   });
 
   const renderResult = await pollingResponse.json()
-  console.log(renderResult);
   if (renderResult.status === 'succeeded') {
-    console.log(renderResult)
     return  renderResult;
   } else if (renderResult.status === 'error') {
     throw new Error(`Render failed: ${renderResult.error}`)
