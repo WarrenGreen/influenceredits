@@ -7,6 +7,9 @@ const ContextMenu = forwardRef(({ x, y,visible, segment}, ref) => {
           <Button  ref={ref} style={{ display:visible, position: "fixed", top: y, left: x, alignItems: "center", display: "flex"}} onClick={() =>{deleteSegment();setVisible("none")}}>Delete <TrashIcon/></Button>
       )
     }
-    )
+  )
 
+ContextMenu.displayName = "ContextMenu";
+
+    
 export default ContextMenu
