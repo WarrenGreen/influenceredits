@@ -21,6 +21,7 @@
     "eslint": "8.46.0",
     "eslint-config-next": "13.4.13",
     "immutability-helper": "^3.1.1",
+    "inngest": "^2.5.0",
     "next": "13.4.13",
     "perf_hooks": "^0.0.1",
     "react": "18.2.0",

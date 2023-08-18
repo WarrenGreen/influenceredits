@@ -1,5 +1,5 @@
 
-export async function createMedia(video, thumbnailUrl, projectId) {
+export async function createMedia(video, projectId) {
   const response = await fetch('/api/media', {
     method: 'POST',
     headers: {
@@ -7,7 +7,6 @@ export async function createMedia(video, thumbnailUrl, projectId) {
     },
     body: JSON.stringify({
       video: video,
-      thumbnailUrl: thumbnailUrl,
       projectId: projectId
     }),
   });

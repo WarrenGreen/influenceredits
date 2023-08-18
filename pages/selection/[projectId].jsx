@@ -114,30 +114,8 @@ export default function Editor({projectVideos, dev = false}) {
     setSelectedVideo(video.id)
     playerRef.current.src=video.url;
 
-    let thumbnailSource = {
-      "output_format": "jpg",
-      "snapshot_time": 0,
-      "width": 150,
-      "height": 150,
-      "elements": [
-        {
-          "type": "video",
-          "source": video.url
-        }
-      ]
-    }
-    requestThumbnail(thumbnailSource).then((thumbnailUrl) => {
-      setVideos((oldVideos) => 
-        oldVideos.map(currentVideo => {
-          if (currentVideo.id == video.id) {
-            return {...currentVideo, thumbnail: thumbnailUrl.url};
-          }else{
-            return {...currentVideo};
-          }
-        })
-      );
-      createMedia(video, thumbnailUrl.url, "e07b5aca-3cb1-11ee-9e28-232206fe9a57");
-    });
+    createMedia(video,  "e07b5aca-3cb1-11ee-9e28-232206fe9a57");
+    
 
 
     setSource({
