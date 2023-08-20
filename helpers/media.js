@@ -1,6 +1,6 @@
 
 export async function createMedia(video, projectId) {
-  const response = await fetch('/api/media', {
+  const response = await fetch(process.env.NEXT_PUBLIC_HOST+'/api/media', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -24,7 +24,7 @@ export async function createMedia(video, projectId) {
 }
 
 export async function getProjectMedia(projectId) {
-  const response = await fetch('http://localhost:8097/api/project/' + projectId, {
+  const response = await fetch(process.env.NEXT_PUBLIC_HOST + '/api/project/' + projectId, {
     method: 'GET',
   });
 

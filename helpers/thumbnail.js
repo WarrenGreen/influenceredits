@@ -3,7 +3,7 @@
 
 export async function getThumbnail(videoId) {
 
-  const response = await fetch('http://localhost:8097/api/thumbnail/' + videoId, {
+  const response = await fetch(process.env.NEXT_PUBLIC_HOST + '/api/thumbnail/' + videoId, {
     method: 'GET',
   });
 

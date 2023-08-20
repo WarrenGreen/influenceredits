@@ -1,7 +1,7 @@
 export async function createSegment(segment) {
+  console.log("HOST: " + process.env.NEXT_PUBLIC_HOST)
 
-
-  const response = await fetch('http://localhost:8097/api/segment', {
+  const response = await fetch(process.env.NEXT_PUBLIC_HOST + '/api/segment', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -19,7 +19,7 @@ export async function createSegment(segment) {
 
 export async function getProjectSegments(projectId) {
 
-  const response = await fetch('http://localhost:8097/api/segment/' + projectId,
+  const response = await fetch(process.env.NEXT_PUBLIC_HOST + '/api/segment/' + projectId,
     {
       method: 'GET',
     }
@@ -31,7 +31,7 @@ export async function getProjectSegments(projectId) {
 
 export async function getSegments(projectMediaId) {
 
-  const response = await fetch('http://localhost:8097/api/segment/' + projectMediaId, {
+  const response = await fetch(process.env.NEXT_PUBLIC_HOST + '/api/segment/' + projectMediaId, {
     method: 'GET',
   });
 
@@ -46,7 +46,7 @@ export async function getSegments(projectMediaId) {
 
 export async function moveSegments(segments) {
 
-  const response = await fetch('http://localhost:8097/api/segment', {
+  const response = await fetch(process.env.NEXT_PUBLIC_HOST + '/api/segment', {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ export async function moveSegments(segments) {
 
 export async function deleteSegment(segmentId) {
 
-  const response = await fetch('http://localhost:8097/api/segment/' + segmentId, {
+  const response = await fetch(process.env.NEXT_PUBLIC_HOST + '/api/segment/' + segmentId, {
     method: 'DELETE',
   });
 

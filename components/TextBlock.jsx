@@ -136,6 +136,7 @@ export default function TextBlock({words, seekVideo, segments, setSegments, proj
       "text": text,
       "projectMediaId": projectMediaId
     };
+    console.log("HOST HERE: "+process.env.NEXT_PUBLIC_HOST)
     setSegments(oldRange => {
       range['index'] = oldRange.length;
       createSegment(range)

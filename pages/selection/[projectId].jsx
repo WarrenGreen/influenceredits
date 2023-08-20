@@ -18,6 +18,7 @@ import { Flex } from '@radix-ui/themes'
 import { Oval } from 'react-loader-spinner'
 import { v4 as uuid } from 'uuid'
 import UploadVideo from '../../components/Upload'
+import { useRouter } from 'next/router'
 
 import React from "react" 
 React.useLayoutEffect = React.useEffect 
@@ -26,17 +27,19 @@ React.useLayoutEffect = React.useEffect
 
 export const getServerSideProps = async ({ params }) => {
   if (typeof params.projectId != "string" || params.projectId == "[object Object]") return {props: {projectVideos: []}}
-  let projectVideos = await getProjectMedia(params.projectId)
-  let projectSegments = await getProjectSegments(params.projectId);
+  const projectId = params.projectId
+  console.log(projectId)
+  let projectVideos = await getProjectMedia(projectId)
+  let projectSegments = await getProjectSegments(projectId);
   console.log(projectSegments);
 
   return {
-    props: {projectVideos, projectSegments},
+    props: {projectVideos, projectSegments, projectId},
   }
   
 }
 
-export default function Editor({projectVideos, projectSegments}) {
+export default function Editor({projectVideos, projectSegments, projectId}) {
   let playerRef = useRef();
 
   let [videos, setVideos] = useState(projectVideos);
@@ -61,6 +64,10 @@ export default function Editor({projectVideos, projectSegments}) {
 
       let start = null;
       let end = null;
+      console.log(segment)
+      console.log(segment.timeStart)
+      console.log(typeof segment.timeStart)
+      console.log(segment.timeStart / 1000)
       let startNum = segment.timeStart / 1000;
       let endNum = segment.timeEnd / 1000;
       if (startNum <= endNum){
@@ -136,7 +143,7 @@ export default function Editor({projectVideos, projectSegments}) {
 
   const uploadFinishedCallback = (video) => {
     
-    createMedia(video,  "e07b5aca-3cb1-11ee-9e28-232206fe9a57").then((newVideo) => {
+    createMedia(video,  projectId).then((newVideo) => {
     setVideos(videos => videos.map((currentVideo) => {
       if (currentVideo.id == newVideo.id) {
         return {...newVideo, status:"transcribing"};
