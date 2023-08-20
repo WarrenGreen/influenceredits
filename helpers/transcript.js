@@ -1,9 +1,11 @@
 
 
 
-export async function getThumbnail(videoId) {
 
-  const response = await fetch('http://localhost:8097/api/thumbnail/' + videoId, {
+
+export async function getTranscript(projectMediaId) {
+
+  const response = await fetch('http://localhost:8097/api/transcript/' + projectMediaId, {
     method: 'GET',
   });
 

@@ -20,7 +20,7 @@ export async function createMedia(video, projectId) {
     }
   }
 
-  return await response.json();
+  return response.json();
 }
 
 export async function getProjectMedia(projectId) {

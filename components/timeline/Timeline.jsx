@@ -1,13 +1,23 @@
 import styles from './timeline.module.css'
 import SortableList, { SortableItem } from 'react-easy-sort'
 import {arrayMoveImmutable} from 'array-move'
-import {ContextMenu} from './ContextMenu'
 import { useState, useRef, forwardRef } from "react";
 import {useModalDismissSignal} from '@/helpers/useModalDismissSignal'
+import { TrashIcon } from '@radix-ui/react-icons'
+import {moveSegments, deleteSegment as deleteSegmentDb} from '@/helpers/segment'
+
+import { Button } from '@radix-ui/themes';
 
 export default function Timeline({ segments, setSegments, totalWords }) {
     const onSortEnd = (oldIndex, newIndex) => {
-      setSegments((array) => arrayMoveImmutable(array, oldIndex, newIndex))
+      setSegments((array) => {
+        let newArray = arrayMoveImmutable(array, oldIndex, newIndex)
+        newArray = newArray.map((segment, ind) => {
+          return {...segment, index:ind}
+        })
+        moveSegments(newArray);
+        return newArray;
+      })
     }
 
     const ref = useRef(null);
@@ -28,6 +38,7 @@ export default function Timeline({ segments, setSegments, totalWords }) {
     useModalDismissSignal(ref, ()=> {setVisible("none")}, true);
 
     const deleteSegment = ( ) => {
+      deleteSegmentDb(currentSegment.id);
       return setSegments((array) => array.filter((segment) => {
         return segment.id != currentSegment.id
       }))
@@ -51,7 +62,7 @@ export default function Timeline({ segments, setSegments, totalWords }) {
                 )
               }
               </SortableList>
-              <ContextMenu ref={ref} visible={visible} x={x} y={y-20} />
+              <Button  ref={ref} style={{ display:visible, position: "fixed", top: y-20, left: x, alignItems: "center"}} onClick={() =>{deleteSegment();setVisible("none")}}>Delete <TrashIcon/></Button>
       </>
     )
 }

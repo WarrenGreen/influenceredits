@@ -1,7 +1,8 @@
 import { Inngest } from "inngest";
 import { serve } from "inngest/next";
-import { requestThumbnail } from "@/helpers/thumbnail"
+import { requestThumbnail, requestTranscription } from "./util"
 import { addThumbnail } from '@/db/media'
+import { createTranscript } from '@/db/transcript'
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ name: "InfluencerEdits" });
@@ -11,16 +12,16 @@ const videoUpload = inngest.createFunction(
   { name: "Video Upload" },
   { event: "media/video.upload" },
   async ({ event, step }) => {
-    thumbnailUrl = await requestThumbnail(video.url)
-    console.log(event)
-    console.log(event.data)
-    console.log(thumbnailUrl)
-    addThumbnail(event.data.video.id, thumbnailUrl)
-    return { event, body: "Hello, World!" };
+    let thumbnailUrl = (await requestThumbnail(event.data.video.url))[0].url
+    let rows = await addThumbnail(event.data.video.id, thumbnailUrl)
+    let transcribedWords = await requestTranscription({ "uploadUrl": event.data.video.url });
+    let transcript = await createTranscript(event.data.projectMediaId, transcribedWords.text, JSON.stringify(transcribedWords.words))
+
+    return { event, body: { rows: rows, transcript: transcript } };
   }
 );
 
 // Create an API that serves zero functions
 export default serve(inngest, [
-  videoUpload
+  videoUpload,
 ]);

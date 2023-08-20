@@ -1,69 +1,61 @@
 import { useEffect, useRef, useState } from 'react'
+import Layout from '../../components/Layout'
 import TextBlock from '../../components/TextBlock'
 import VideoBlock from '../../components/VideoBlock'
 import Timeline from '../../components/timeline/Timeline'
-import {requestThumbnail} from '../../helpers/finishVideo'
-import Layout from '../../components/Layout'
-import { requestTranscription, defaultWords, defaultVideos, VideoComponent } from '../../helpers/utils'
-import { useRouter } from 'next/router'
+import { defaultVideos, defaultWords } from '../../helpers/utils'
 
-import {createMedia, getProjectMedia} from '@/helpers/media'
+import { createMedia, getProjectMedia } from '@/helpers/media'
+import {getSegments, getProjectSegments} from '@/helpers/segment'
+import {getTranscript} from '@/helpers/transcript'
+import { getThumbnail } from '@/helpers/thumbnail'
+import {useInterval} from '@/helpers/useInterval'
 
-import ProcessStatus from '@/components/process_status/ProcessStatus'
 import PreviewModal from '@/components/PreviewModal'
 import RenderModal from '@/components/RenderModal'
-import { Flex } from '@radix-ui/themes';
+import ProcessStatus from '@/components/process_status/ProcessStatus'
+import { Flex } from '@radix-ui/themes'
+import { Oval } from 'react-loader-spinner'
+import { v4 as uuid } from 'uuid'
 import UploadVideo from '../../components/Upload'
-import {v4 as uuid} from 'uuid';
-import {Oval} from 'react-loader-spinner';
+
+import React from "react" 
+React.useLayoutEffect = React.useEffect 
 
 
 
 export const getServerSideProps = async ({ params }) => {
+  if (typeof params.projectId != "string" || params.projectId == "[object Object]") return {props: {projectVideos: []}}
   let projectVideos = await getProjectMedia(params.projectId)
+  let projectSegments = await getProjectSegments(params.projectId);
+  console.log(projectSegments);
 
   return {
-    props: {projectVideos},
+    props: {projectVideos, projectSegments},
   }
   
 }
 
-export default function Editor({projectVideos, dev = false}) {
-  
-  let wordsDefault = []
-  let videosDefault = projectVideos;
+export default function Editor({projectVideos, projectSegments}) {
   let playerRef = useRef();
-  if (dev) {
-    wordsDefault = defaultWords;
-    videosDefault = defaultVideos;
-  }
-  let [words, setWords] = useState(wordsDefault);
-  let [videos, setVideos] = useState(videosDefault);
+
+  let [videos, setVideos] = useState(projectVideos);
   let [selectedVideo, setSelectedVideo] = useState(videos.length ==0? null: videos[0].id);
-  const [segments, setSegments] = useState([]);
-  const defaultSource = videosDefault.map((defaultVideo) => {
-    return {
+  const [segments, setSegments] = useState(projectSegments);
+  const defaultSource = {
     "output_format": "mp4",
     "width": 240,
     "height": 135,
     "elements": [
       {
-        "id": defaultVideo.id,
-        "type": "video",
-        "track": 1,
-        "trim_start": 0,
-        "trim_duration":47,
-        "thumbnail":  defaultVideo.thumbnailUrl,
-        "source": defaultVideo.url
       },
     ]
   }
-});
   const [source, setSource] = useState(defaultSource);
 
 
   useEffect(() => {
-    const newSource = {...defaultSource};
+    const newSource = {...source};
     newSource["elements"] = segments.map((segment) => {
       
 
@@ -101,54 +93,77 @@ export default function Editor({projectVideos, dev = false}) {
     playerRef.current.currentTime=Math.round(time/1000);
   }
 
+  const refreshThumbnails = async () => {
+    videos.map(async (video) =>{ 
+      if (video.thumbnail == null || video.thumbnail == "") {
+        let thumbnailUrl = await getThumbnail(video.id)
+          if (thumbnailUrl){
+            setVideos(videos => videos.map((currentVideo) => {
+              if (currentVideo.id == video.id) {
+                return {...video, thumbnail:thumbnailUrl};
+              }else{
+                return {...currentVideo};
+              }
+            }));
+          }
+      }
+    });
+  }
+
+  async function refreshWords()  {
+    videos.map(async (video) =>{ 
+        if (video.projectMediaId != null && video.loading) {
+          console.log("words: " + video.projectMediaId)
+          console.log(video.words)
+          let transcript = await getTranscript(video.projectMediaId)
+            console.log(transcript)
+            if (transcript.length <=0 || !transcript[0].words) return;
+            setVideos(videos => videos.map((currentVideo) => {
+              if (currentVideo.id == video.id) {
+                return {...video, words:transcript[0].words, status:"loaded", loading: false};
+              }else{
+                return {...currentVideo};
+              }
+            }));
+        }
+    })
+  }
+
+  useInterval(() => {
+    refreshWords();
+    refreshThumbnails();
+  }, 1000);
 
   const uploadFinishedCallback = (video) => {
     
+    createMedia(video,  "e07b5aca-3cb1-11ee-9e28-232206fe9a57").then((newVideo) => {
     setVideos(videos => videos.map((currentVideo) => {
-      if (currentVideo.id == video.id) {
-        return {...video, status:"transcribing"};
+      if (currentVideo.id == newVideo.id) {
+        return {...newVideo, status:"transcribing"};
       }else{
         return {...currentVideo};
       }
     }));
     setSelectedVideo(video.id)
     playerRef.current.src=video.url;
+    //setSource({
+    //  "output_format": "mp4",
+    //  "width": 2400,
+    //  "height": 1350,
+    //  "duration": "47 s",
+    //  "elements": [
+    //    {
+    //      "id": video.id,
+    //      "type": "video",
+    //      "track": 1,
+    //      "trim_start": 0,
+    //      "trim_duration":47,
+    //      "source": video.url
+    //    },
+    //  ]
+    //})
 
-    createMedia(video,  "e07b5aca-3cb1-11ee-9e28-232206fe9a57");
-    
-
-
-    setSource({
-      "output_format": "mp4",
-      "width": 2400,
-      "height": 1350,
-      "duration": "47 s",
-      "elements": [
-        {
-          "id": video.id,
-          "type": "video",
-          "track": 1,
-          "trim_start": 0,
-          "trim_duration":47,
-          "source": video.url
-        },
-      ]
     })
-
-    async function request() {
-      let transcribedWords = await requestTranscription({"uploadUrl": video.url});
-      setVideos(oldVideos => oldVideos.map((currVideo) => {
-        if (currVideo.id == video.id) {
-          return {...currVideo, status:"loaded", loading: false};
-        }else{
-          return {...currVideo};
-        }
-      }));
-      setWords(transcribedWords);
-        
-      }
-      request();
-
   }
 
   const uploadStartedCallback = (video) => {
@@ -183,28 +198,32 @@ export default function Editor({projectVideos, dev = false}) {
 		  </div>
 
       
-      {currentVideo && currentVideo.loading ? 
-        <div className="content-loading">
-        <Oval
-        height={50}
-        width={50}
-        color="#BEADFA"
-        wrapperStyle={{}}
-        wrapperClass=""
-        visible={true}
-        ariaLabel='oval-loading'
-        secondaryColor=""
-        strokeWidth={4}
-        strokeWidthSecondary={4}
-      
-      /><div>{currentVideo.status}</div>
-      </div>
+      {
+      currentVideo == null ? 
+        <></>
+      : 
+        (currentVideo.loading ? 
+          <div className="content-loading">
+            <Oval
+            height={50}
+            width={50}
+            color="#BEADFA"
+            wrapperStyle={{}}
+            wrapperClass=""
+            visible={true}
+            ariaLabel='oval-loading'
+            secondaryColor=""
+            strokeWidth={4}
+            strokeWidthSecondary={4}/>
+            <div>{currentVideo.status}</div>
+          </div>
         :
-        <TextBlock words={words} seekVideo={seekVideo} segments={segments} setSegments={setSegments} />
+          <TextBlock words={currentVideo.words} seekVideo={seekVideo} segments={segments} setSegments={setSegments} projectMediaId={currentVideo.projectMediaId} />
+        )
       }
       
     </Flex>
-    <Timeline segments={segments} setSegments={setSegments} totalWords={words.length}></Timeline>
+    <Timeline segments={segments} setSegments={setSegments} totalWords={currentVideo == null ? 0 :currentVideo.words.length}></Timeline>
     </Layout>
   </>
       

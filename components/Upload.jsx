@@ -31,7 +31,9 @@ export default function UploadVideo({uploadStartedCallback, uploadFinishedCallba
 
     let videoId = uuid();
     let splits = file.name.split(".")
-    let videoExtension = splits[splits.lenth-1];
+    let videoExtension = splits[splits.length-1];
+    console.log(splits)
+    console.log(splits[splits.length-1])
     let storageName = videoId + "." + videoExtension;
 
     // Files Parameters
@@ -47,7 +49,8 @@ export default function UploadVideo({uploadStartedCallback, uploadFinishedCallba
       "name": file.name,
       "status": "uploading",
       "thumbnail": "",
-      "loading": true
+      "loading": true,
+      "words": []
     }
 
     // Uploading file to s3
@@ -64,7 +67,6 @@ export default function UploadVideo({uploadStartedCallback, uploadFinishedCallba
     uploadStartedCallback(video);
 
     await upload.then((err, data) => {
-      console.log(err);
       uploadFinishedCallback({...video, status: "uploaded"});
     });
   };

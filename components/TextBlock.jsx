@@ -2,19 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { debounce } from "../helpers/utils";
 import Word from "../components/Word";
 import {v4 as uuid} from "uuid";
+import {createSegment} from "@/helpers/segment"
 
-export default function TextBlock({words, seekVideo, segments, setSegments}) {
+export default function TextBlock({words, seekVideo, segments, setSegments, projectMediaId}) {
   let colors = ["#FF6363", "#FFAB76", "#FFFDA2", "#BAFFB4", "#FF52A2", "#A084E8", "#95BDFF", "#86C8BC"];
-  let [colorIndex, setColorIndex] = useState(0);
-
 
   const getColor = () =>  {
-    if (colorIndex + 1 >= colors.length) {
-      setColorIndex(0);
-    } else{
-      setColorIndex(color => colorIndex +1);
-    }
-    return colors[colorIndex];
+    return colors[segments.length % colors.length];
   }
 
   useEffect(() => {
@@ -37,16 +31,34 @@ export default function TextBlock({words, seekVideo, segments, setSegments}) {
   }
 
   setWordsState(state);
+  paintRanges()
 
   }, [words])
+
+  useEffect(() => {
+    let state = []
+    for (let index in words) {
+      state.push({
+        id: uuid(),
+        index: index,
+        selected: false,
+        selectedStart: false,
+        selectedEnd: false,
+        inRange: false,
+        rangeStart: false,
+        rangeEnd: false,
+        rangeColor: null,
+        text: words[index].text,
+        videoStart: words[index].start,
+        videoEnd: words[index].end,
+      });
+    }
+  
+    setWordsState(oldState=>state);
+    paintRanges()
+    }, [])
   
   let [wordsState, setWordsState] = useState([]);
-  let rangeMap = {};
-  for (let rangeIndex in segments) {
-    for (let wordIndex = segments[rangeIndex].start; wordIndex <=segments[rangeIndex].end ;wordIndex += 1){
-      rangeMap[wordIndex] = segments[rangeIndex].color;
-    }
-  }
 
   const resetSelection = () => {
     setWordsState(oldWordState => {
@@ -114,9 +126,21 @@ export default function TextBlock({words, seekVideo, segments, setSegments}) {
       else if (start <= wordsState[index].index && wordsState[index].index <= end) text += " " + wordsState[index].text;
     }
 
-    if (wordsState[end] == null) { console.log("FFUCK: "+end); console.log(wordsState[end])}
-    let range = {"id": uuid(), "timeStart": wordsState[start].videoStart, "timeEnd": wordsState[end].videoEnd, "start": start, "end": end, "color": chosenColor, "text": text};
-    setSegments(oldRange => [...oldRange, range]);
+    let range = {
+      "id": uuid(),
+      "timeStart": wordsState[start].videoStart,
+      "timeEnd": wordsState[end].videoEnd,
+      "start": start,
+      "end": end,
+      "color": chosenColor,
+      "text": text,
+      "projectMediaId": projectMediaId
+    };
+    setSegments(oldRange => {
+      range['index'] = oldRange.length;
+      createSegment(range)
+      return [...oldRange, range];
+    });
     resetSelection();
     
   };
