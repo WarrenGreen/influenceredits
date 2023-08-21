@@ -110,10 +110,10 @@ export default function TextBlock({words, seekVideo, segments, setSegments, proj
   const removeSelection = (segment, selectionStart, selectionEnd) => {
     if (segment.start == selectionStart) {
       segment.start=selectionEnd+1;
-      segment.timeStart = wordsState[selectionStart].videoStart
+      segment.timeStart = wordsState[selectionEnd+1].videoStart
     } else if (segment.end == selectionEnd) {
       segment.end = selectionStart-1;
-      segment.timeEnd = wordsState[selectionEnd].videoEnd
+      segment.timeEnd = wordsState[selectionStart-1].videoEnd
     } else {
       throw new Error("Selection is fucked");
     }
