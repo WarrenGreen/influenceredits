@@ -28,13 +28,8 @@ React.useLayoutEffect = React.useEffect
 export const getServerSideProps = async ({ params }) => {
   if (typeof params.projectId != "string" || params.projectId == "[object Object]") return {props: {projectVideos: []}}
   const projectId = params.projectId
-  console.log(projectId)
   let projectVideos = await getProjectMedia(projectId)
   let projectSegments = await getProjectSegments(projectId);
-  console.log("segments")
-  console.log(projectSegments);
-  console.log("videos")
-  console.log(projectVideos)
 
   return {
     props: {projectVideos, projectSegments, projectId},
@@ -67,10 +62,6 @@ export default function Editor({projectVideos, projectSegments, projectId}) {
 
       let start = null;
       let end = null;
-      console.log(segment)
-      console.log(segment.timeStart)
-      console.log(typeof segment.timeStart)
-      console.log(segment.timeStart / 1000)
       let startNum = segment.timeStart / 1000;
       let endNum = segment.timeEnd / 1000;
       if (startNum <= endNum){
@@ -123,10 +114,7 @@ export default function Editor({projectVideos, projectSegments, projectId}) {
   async function refreshWords()  {
     videos.map(async (video) =>{ 
         if (video.projectMediaId != null && video.loading) {
-          console.log("words: " + video.projectMediaId)
-          console.log(video.words)
           let transcript = await getTranscript(video.projectMediaId)
-            console.log(transcript)
             if (transcript.length <=0 || !transcript[0].words) return;
             setVideos(videos => videos.map((currentVideo) => {
               if (currentVideo.id == video.id) {

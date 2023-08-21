@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { debounce } from "../helpers/utils";
 import Word from "../components/Word";
 import {v4 as uuid} from "uuid";
-import {createSegment} from "@/helpers/segment"
+import {createSegment, editSegments} from "@/helpers/segment"
 
 export default function TextBlock({words, seekVideo, segments, setSegments, projectMediaId}) {
   let colors = ["#FF6363", "#FFAB76", "#FFFDA2", "#BAFFB4", "#FF52A2", "#A084E8", "#95BDFF", "#86C8BC"];
@@ -98,51 +98,128 @@ export default function TextBlock({words, seekVideo, segments, setSegments, proj
     paintRanges();
   }, [segments])
 
+  const collectText = (selectionStart, selectionEnd) => {
+    let text = "";
+    for (let index in wordsState) {
+      if (wordsState[index].index == selectionStart) text += wordsState[index].text
+      else if (selectionStart <= wordsState[index].index && wordsState[index].index <= selectionEnd) text += " " + wordsState[index].text;
+    }
+    return text;
+  }
+
+  const removeSelection = (segment, selectionStart, selectionEnd) => {
+    if (segment.start == selectionStart) {
+      segment.start=selectionEnd+1;
+      segment.timeStart = wordsState[selectionEnd+1].videoStart
+    } else if (segment.end == selectionEnd) {
+      segment.end = selectionStart-1;
+      segment.timeEnd = wordsState[selectionStart-1].videoEnd
+    } else {
+      throw new Error("Selection is fucked");
+    }
+
+    segment.text = collectText(segment.start, segment.end)
+
+    return segment;
+  }
+
+  const expandSelection = (segment, selectionStart, selectionEnd) => {
+    if (segment.start == selectionEnd) {
+      segment.start=selectionStart;
+      segment.timeStart = wordsState[selectionStart].videoStart
+    } else if (segment.end == selectionStart) {
+      segment.end = selectionEnd;
+      segment.timeEnd = wordsState[selectionEnd].videoEnd
+    } else {
+      throw new Error("Selection is fucked");
+    }
+    segment.text = collectText(segment.start, segment.end)
+
+
+    return segment;
+  }
+
+  const updateSegments = (segment) => {
+    setSegments((oldSegments) => {
+      let updatedSegments = oldSegments.map((oldSegment) => {
+        if (oldSegment.id == segment.id) {
+          return {...segment};
+        } else{
+          return {...oldSegment};
+        }
+      })
+      editSegments(updatedSegments);
+      return updatedSegments;
+    })
+  }
+
   const mouseCement = () => {
     let chosenColor = getColor();
 
-    let start = null;
-    let end = null;
+    let selectionStart = null;
+    let selectionEnd = null;
     let startNum = parseInt(startIndex);
     let currentNum = parseInt(endIndex);
     if (startNum <= currentNum){
-      start = startNum;
-      end=currentNum;
+      selectionStart = startNum;
+      selectionEnd=currentNum;
     }else{
-      start=currentNum;
-      end = startNum;
+      selectionStart=currentNum;
+      selectionEnd = startNum;
     }
     setStartIndex(null);
     setEndIndex(null);
 
 
-    if (start == null || end == null || isNaN(start) || isNaN(end) ) { 
+    if (selectionStart == null || selectionEnd == null || isNaN(selectionStart) || isNaN(selectionEnd) ) { 
       return;
     }
 
-    let text = "";
-    for (let index in wordsState) {
-      if (wordsState[index].index == start) text += wordsState[index].text
-      else if (start <= wordsState[index].index && wordsState[index].index <= end) text += " " + wordsState[index].text;
-    }
+    resetSelection();
 
+    // Start segment editting
+
+    let expansionOrRemoval = false;
+    segments.map((segment) => {
+      if (
+        //Removal
+        ((segment.start == selectionStart || segment.end == selectionStart) && (segment.start <= selectionEnd && selectionEnd <= segment.end))
+        ||
+        ((segment.start == selectionEnd || segment.end == selectionEnd) && (segment.start <= selectionStart && selectionStart <= segment.end))) {
+          let newSegment = removeSelection(segment, selectionStart, selectionEnd);
+          updateSegments(newSegment);
+          expansionOrRemoval = true;
+      } else if (
+        //Expansion
+        ((segment.start == selectionStart || segment.end == selectionStart) && (segment.start >= selectionEnd || selectionEnd >= segment.end))
+        ||
+        ((segment.start == selectionEnd || segment.end == selectionEnd) && (segment.start >= selectionStart || selectionStart >= segment.end))) {
+          let newSegment = expandSelection(segment, selectionStart, selectionEnd);
+          updateSegments(newSegment);
+          expansionOrRemoval = true;
+      }   
+    })
+    if (expansionOrRemoval) return;
+
+    // End segment editting
+
+    // Start segment creation
     let range = {
       "id": uuid(),
-      "timeStart": wordsState[start].videoStart,
-      "timeEnd": wordsState[end].videoEnd,
-      "start": start,
-      "end": end,
+      "timeStart": wordsState[selectionStart].videoStart,
+      "timeEnd": wordsState[selectionEnd].videoEnd,
+      "start": selectionStart,
+      "end": selectionEnd,
       "color": chosenColor,
-      "text": text,
+      "text": collectText(selectionStart, selectionEnd),
       "projectMediaId": projectMediaId
     };
-    console.log("HOST HERE: "+process.env.NEXT_PUBLIC_HOST)
     setSegments(oldRange => {
       range['index'] = oldRange.length;
       createSegment(range)
       return [...oldRange, range];
     });
-    resetSelection();
+    // End segment creation
     
   };
 

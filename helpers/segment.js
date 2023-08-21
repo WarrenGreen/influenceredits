@@ -1,6 +1,4 @@
 export async function createSegment(segment) {
-  console.log("HOST: " + process.env.NEXT_PUBLIC_HOST)
-
   const response = await fetch(process.env.NEXT_PUBLIC_HOST + '/api/segment', {
     method: 'POST',
     headers: {
@@ -44,7 +42,7 @@ export async function getSegments(projectMediaId) {
 }
 
 
-export async function moveSegments(segments) {
+export async function editSegments(segments) {
 
   const response = await fetch(process.env.NEXT_PUBLIC_HOST + '/api/segment', {
     method: 'PUT',

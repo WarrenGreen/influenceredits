@@ -10,12 +10,17 @@ export async function createSegment(segment) {
   return rows, fields;
 }
 
-
-export async function moveSegments(segments) {
+export async function editSegments(segments) {
   let global_rows = segments.map(async (segment) => {
     let { rows, fields } = await sql`
     UPDATE segment 
-    SET index=${segment.index}
+    SET start_index=${segment.start},
+    end_index=${segment.end},
+    start_time=${segment.timeStart},
+    end_time=${segment.timeEnd},
+    color=${segment.color},
+    text=${segment.text},
+    index=${segment.index}
     WHERE id=${segment.id}`;
 
     return [...rows];
