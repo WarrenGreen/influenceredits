@@ -8,7 +8,7 @@ import {moveSegments, deleteSegment as deleteSegmentDb} from '@/helpers/segment'
 
 import { Button } from '@radix-ui/themes';
 
-export default function Timeline({ segments, setSegments, totalWords }) {
+export default function Timeline({ segments, setSegments }) {
     const onSortEnd = (oldIndex, newIndex) => {
       setSegments((array) => {
         let newArray = arrayMoveImmutable(array, oldIndex, newIndex)
@@ -45,7 +45,7 @@ export default function Timeline({ segments, setSegments, totalWords }) {
     }
 
     const scale = (text) => {
-      return Math.max(100, text.split(" ").length / totalWords *500)+"px";
+      return "100px";
     }
     return (
       <>

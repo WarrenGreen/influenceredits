@@ -31,7 +31,10 @@ export const getServerSideProps = async ({ params }) => {
   console.log(projectId)
   let projectVideos = await getProjectMedia(projectId)
   let projectSegments = await getProjectSegments(projectId);
+  console.log("segments")
   console.log(projectSegments);
+  console.log("videos")
+  console.log(projectVideos)
 
   return {
     props: {projectVideos, projectSegments, projectId},
@@ -230,7 +233,7 @@ export default function Editor({projectVideos, projectSegments, projectId}) {
       }
       
     </Flex>
-    <Timeline segments={segments} setSegments={setSegments} totalWords={currentVideo == null ? 0 :currentVideo.words.length}></Timeline>
+    <Timeline segments={segments} setSegments={setSegments} x></Timeline>
     </Layout>
   </>
       
