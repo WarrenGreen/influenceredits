@@ -32,8 +32,6 @@ export default function UploadVideo({uploadStartedCallback, uploadFinishedCallba
     let videoId = uuid();
     let splits = file.name.split(".")
     let videoExtension = splits[splits.length-1];
-    console.log(splits)
-    console.log(splits[splits.length-1])
     let storageName = videoId + "." + videoExtension;
 
     // Files Parameters

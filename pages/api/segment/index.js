@@ -1,4 +1,4 @@
-import { createSegment, moveSegments } from '@/db/segment'
+import { createSegment, editSegments } from '@/db/segment'
 
 
 export default async function handle(req, res) {
@@ -12,7 +12,7 @@ export default async function handle(req, res) {
   } else if (req.method === 'PUT') {
     const segments = req.body;
 
-    let rows = await moveSegments(segments);
+    let rows = await editSegments(segments);
 
     res.json(rows);
 

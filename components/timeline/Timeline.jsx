@@ -4,7 +4,7 @@ import {arrayMoveImmutable} from 'array-move'
 import { useState, useRef, forwardRef } from "react";
 import {useModalDismissSignal} from '@/helpers/useModalDismissSignal'
 import { TrashIcon } from '@radix-ui/react-icons'
-import {moveSegments, deleteSegment as deleteSegmentDb} from '@/helpers/segment'
+import {editSegments, deleteSegment as deleteSegmentDb} from '@/helpers/segment'
 
 import { Button } from '@radix-ui/themes';
 
@@ -15,7 +15,7 @@ export default function Timeline({ segments, setSegments }) {
         newArray = newArray.map((segment, ind) => {
           return {...segment, index:ind}
         })
-        moveSegments(newArray);
+        editSegments(newArray);
         return newArray;
       })
     }
