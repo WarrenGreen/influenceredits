@@ -11,7 +11,7 @@ import {updateSegments} from '@/helpers/segment'
 export default function EditSegmentModal({style, segment, setSegments, video}) {
   const [startStop, setStartStop] = useState([segment.timeStart / 1000, segment.timeEnd / 1000])
   useEffect(()=>{
-    setStartStop([segment.timeStart / 1000, segment.timeEnd / 1000])
+    reset();
   }, [segment])
   const initialSource = {
     "output_format": "mp4",
@@ -80,6 +80,10 @@ const thumbChange = (newVal, thumbIndex) => {
   setStartStop(newVal)
   setSource(initialSource)
 }
+const reset = () => {
+  setStartStop([segment.timeStart / 1000, segment.timeEnd / 1000]);
+  setSource(initialSource);
+}
 
 const save = () => {
   let editedSegment = {...segment};
@@ -93,7 +97,7 @@ const limitsBuffer = Math.min(5, Math.max(1, ((segment.timeEnd - segment.timeSta
 const Track = (props, state) => <StyledTrack {...props} index={state.index} />;
   
   return (
-    <Dialog.Root>
+    <Dialog.Root onOpenChange={reset}>
       <Dialog.Trigger>
         <Button style={style}>Edit Segment</Button>
       </Dialog.Trigger>
@@ -107,7 +111,7 @@ const Track = (props, state) => <StyledTrack {...props} index={state.index} />;
 
         <Flex justify="end" style={{margin: "10px"}}>
           <Dialog.Close>
-            <Button variant="soft" color="gray">
+            <Button onClick={reset} variant="soft" color="gray">
               Close
             </Button>
           </Dialog.Close>
