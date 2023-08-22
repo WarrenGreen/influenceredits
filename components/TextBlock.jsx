@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { debounce } from "../helpers/utils";
 import Word from "../components/Word";
 import {v4 as uuid} from "uuid";
-import {createSegment, editSegments, deleteSegment as deleteSegmentDb} from "@/helpers/segment"
+import {createSegment, updateSegments, deleteSegment as deleteSegmentDb} from "@/helpers/segment"
 import {useModalDismissSignal} from '@/helpers/useModalDismissSignal'
 import { TrashIcon } from '@radix-ui/react-icons'
 import { Button, Flex } from '@radix-ui/themes';
@@ -143,20 +143,7 @@ export default function TextBlock({video, seekVideo, segments, setSegments, proj
 
     return segment;
   }
-
-  const updateSegments = (segment) => {
-    setSegments((oldSegments) => {
-      let updatedSegments = oldSegments.map((oldSegment) => {
-        if (oldSegment.id == segment.id) {
-          return {...segment};
-        } else{
-          return {...oldSegment};
-        }
-      })
-      editSegments(updatedSegments);
-      return updatedSegments;
-    })
-  }
+  
 
   const mouseCement = () => {
     let chosenColor = getColor();
@@ -192,7 +179,7 @@ export default function TextBlock({video, seekVideo, segments, setSegments, proj
         ||
         ((segment.start == selectionEnd || segment.end == selectionEnd) && (segment.start <= selectionStart && selectionStart <= segment.end))) {
           let newSegment = removeSelection(segment, selectionStart, selectionEnd);
-          updateSegments(newSegment);
+          updateSegments(newSegment, setSegments);
           expansionOrRemoval = true;
       } else if (
         //Expansion
@@ -200,7 +187,7 @@ export default function TextBlock({video, seekVideo, segments, setSegments, proj
         ||
         ((segment.start == selectionEnd || segment.end == selectionEnd) && (segment.start >= selectionStart || selectionStart >= segment.end))) {
           let newSegment = expandSelection(segment, selectionStart, selectionEnd);
-          updateSegments(newSegment);
+          updateSegments(newSegment, setSegments);
           expansionOrRemoval = true;
       }   
     })
@@ -340,7 +327,7 @@ export default function TextBlock({video, seekVideo, segments, setSegments, proj
     
     <div ref={ref}  style={{ minWidth:"175px", flexDirection:"column", alignItems:"start", display:visible, position: "fixed", top: y-20-30, left: x, borderRadius:"5px", overflow:"hidden"}} onClick={() =>{setVisible("none")}}>
     {currentSegment!=null ? 
-      <><EditSegmentModal style={{ width:"100%", borderRadius: "0px"}} segment={currentSegment} video={video}/>
+      <><EditSegmentModal setSegments={setSegments} style={{ width:"100%", borderRadius: "0px"}} segment={currentSegment} video={video}/>
       <Button style={{width:"100%", borderRadius: "0px"}}onClick={() =>{deleteSegment();setVisible("none")}}>Delete <TrashIcon/></Button></>
       : <></>}
       </div>

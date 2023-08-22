@@ -5,9 +5,10 @@ import {v4 as uuid} from "uuid";
 import ReactSlider from 'react-slider'
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import {updateSegments} from '@/helpers/segment'
 
 
-export default function EditSegmentModal({style, segment, video}) {
+export default function EditSegmentModal({style, segment, setSegments, video}) {
   const [startStop, setStartStop] = useState([segment.timeStart / 1000, segment.timeEnd / 1000])
   useEffect(()=>{
     setStartStop([segment.timeStart / 1000, segment.timeEnd / 1000])
@@ -71,13 +72,20 @@ const thumbChange = (newVal, thumbIndex) => {
         "type": "video",
         "track": 1,
         "trim_start": newVal[0],
-        "trim_duration": newVal[1] - newVal[0],
+        "trim_duration": (newVal[1] - newVal[0]),
         "source": video.url
       },
     ]
   }
   setStartStop(newVal)
   setSource(initialSource)
+}
+
+const save = () => {
+  let editedSegment = {...segment};
+  editedSegment.timeStart = Math.round(startStop[0]*1000);
+  editedSegment.timeEnd = Math.round(startStop[1]*1000);
+  updateSegments(editedSegment, setSegments)
 }
 
 const limitsBuffer = Math.min(5, Math.max(1, ((segment.timeEnd - segment.timeStart)/1000)))
@@ -101,6 +109,11 @@ const Track = (props, state) => <StyledTrack {...props} index={state.index} />;
           <Dialog.Close>
             <Button variant="soft" color="gray">
               Close
+            </Button>
+          </Dialog.Close>
+          <Dialog.Close>
+          <Button onClick={save} variant="soft">
+              Save
             </Button>
           </Dialog.Close>
       </Flex>
