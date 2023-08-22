@@ -65,7 +65,7 @@ export default function Timeline({ video, segments, setSegments }) {
               }
               </SortableList>
               <div ref={ref}  style={{ minWidth:"175px", flexDirection:"column", alignItems:"start", display:visible, position: "fixed", top: y-20-30, left: x, borderRadius:"5px", overflow:"hidden"}} onClick={() =>{setVisible("none")}}>
-      <EditSegmentModal style={{ width:"100%", borderRadius: "0px"}} segment={currentSegment} video={video}/>
+              {currentSegment!=null ? <EditSegmentModal style={{ width:"100%", borderRadius: "0px"}} segment={currentSegment} video={video}/>: <Button disabled style={{width:"100%", borderRadius: "0px"}}>Edit Segment</Button>}
       <Button style={{width:"100%", borderRadius: "0px"}}onClick={() =>{deleteSegment();setVisible("none")}}>Delete <TrashIcon/></Button>
     </div>
       </>

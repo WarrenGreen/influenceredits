@@ -8,7 +8,6 @@ import styled from 'styled-components';
 
 
 export default function EditSegmentModal({style, segment, video}) {
-  if (!segment) return <></>;
   const [startStop, setStartStop] = useState([segment.timeStart / 1000, segment.timeEnd / 1000])
   useEffect(()=>{
     setStartStop([segment.timeStart / 1000, segment.timeEnd / 1000])
