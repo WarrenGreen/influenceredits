@@ -312,7 +312,7 @@ export default function TextBlock({video, seekVideo, segments, setSegments, proj
 
   return (
     <>
-    <div onMouseUp={onMouseUp} onMouseMove={onMouseMove}  className="content-loaded">
+    <div onMouseUp={onMouseUp} onMouseMove={onMouseMove}  className={"content-loaded prevent-select"}>
       {wordsState.map((state)=> 
         <Word 
           onContextMenu={(e) => { onContextMenu(e, state)}}

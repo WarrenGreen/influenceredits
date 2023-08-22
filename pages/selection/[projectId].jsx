@@ -19,6 +19,7 @@ import { Oval } from 'react-loader-spinner'
 import { v4 as uuid } from 'uuid'
 import UploadVideo from '../../components/Upload'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 
 import React from "react" 
 React.useLayoutEffect = React.useEffect 
@@ -183,7 +184,7 @@ export default function Editor({projectVideos, projectSegments, projectId}) {
   return (
     <>
     <Layout>
-      <ProcessStatus style={{top:"0", height: "3.5rem"}} />
+      <ProcessStatus state="select" projectId={projectId} style={{top:"0", height: "3.5rem"}} />
     <Flex direction="row" position="fixed" style={{top:"3.5rem", bottom:"3.5rem"}} width="100%">
       <div className="sidebar"> 
         {currentVideo != null ? <video controls ref={playerRef} src={currentVideo? currentVideo.url: null} width="100%"></video> :<div style={{height:"250px", width: "100%", backgroundColor:"gray"}}></div>}

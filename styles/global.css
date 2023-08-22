@@ -7,6 +7,12 @@ header {
     width: 100%;
     height: 3.5rem;
   }
+
+  .prevent-select {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+  }
   
   .my-settings {
     --cfg-pubkey: 'af2bd40cf9274fb845e6';
