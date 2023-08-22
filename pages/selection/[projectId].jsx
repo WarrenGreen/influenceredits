@@ -11,7 +11,7 @@ import {getTranscript} from '@/helpers/transcript'
 import { getThumbnail } from '@/helpers/thumbnail'
 import {useInterval} from '@/helpers/useInterval'
 
-import PreviewModal from '@/components/PreviewModal'
+import PreviewModal from '@/components/preview_modal/PreviewModal'
 import RenderModal from '@/components/RenderModal'
 import ProcessStatus from '@/components/process_status/ProcessStatus'
 import { Flex } from '@radix-ui/themes'
@@ -170,12 +170,14 @@ export default function Editor({projectVideos, projectSegments, projectId}) {
 
   }
 
-  let currentVideo = null;
+
+  let currentVideo_beta = null;
   for (let index in videos) {
     if (selectedVideo == videos[index].id) {
-      currentVideo = videos[index]
+      currentVideo_beta = videos[index]
     }
   }
+  const [currentVideo, setCurrentVideo] = useState(currentVideo_beta)
 
 
   return (
@@ -216,12 +218,12 @@ export default function Editor({projectVideos, projectSegments, projectId}) {
             <div>{currentVideo.status}</div>
           </div>
         :
-          <TextBlock words={currentVideo.words} seekVideo={seekVideo} segments={segments} setSegments={setSegments} projectMediaId={currentVideo.projectMediaId} />
+          <TextBlock video={currentVideo} seekVideo={seekVideo} segments={segments} setSegments={setSegments} projectMediaId={currentVideo.projectMediaId} />
         )
       }
       
     </Flex>
-    <Timeline segments={segments} setSegments={setSegments} x></Timeline>
+    <Timeline video={currentVideo} segments={segments} setSegments={setSegments} x></Timeline>
     </Layout>
   </>
       

@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Preview, PreviewState } from '@creatomate/preview';
 import {v4 as uuid} from 'uuid';
 import {Oval} from 'react-loader-spinner';
+import { Dialog, Button, Flex, Text, TextField,  } from '@radix-ui/themes';
+
 
 export default function MyPreview ({source})  {
 
@@ -61,15 +63,16 @@ export default function MyPreview ({source})  {
 
   return (
     <>
-      <div style={{display: isLoading? "none": null}} ref={(htmlElement) => {
+      <div style={{flexGrow: 1, display: isLoading? "none": null}} ref={(htmlElement) => {
             if (htmlElement && htmlElement !== previewRef.current?.element) {
               setUpPreview(htmlElement);
             }
           }}></div>
       {isLoading && 
+      <Flex align="center" justify="center" style={{flexGrow: 1}}>
       <Oval
-      height={50}
-      width={50}
+      height={75}
+      width={75}
       color="#BEADFA"
       wrapperStyle={{}}
       wrapperClass=""
@@ -78,8 +81,7 @@ export default function MyPreview ({source})  {
       secondaryColor=""
       strokeWidth={4}
       strokeWidthSecondary={4}
-    
-    />}
+    /></Flex>}
     </>
   );
 };
