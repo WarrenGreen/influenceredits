@@ -2,11 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { debounce } from "../helpers/utils";
 import Word from "../components/Word";
 import {v4 as uuid} from "uuid";
-import {createSegment, editSegments} from "@/helpers/segment"
+import {createSegment, updateSegments, deleteSegment as deleteSegmentDb} from "@/helpers/segment"
+import {useModalDismissSignal} from '@/helpers/useModalDismissSignal'
+import { TrashIcon } from '@radix-ui/react-icons'
+import { Button, Flex } from '@radix-ui/themes';
+import EditSegmentModal from '@/components/edit_segment_modal/EditSegmentModal'
 
-export default function TextBlock({words, seekVideo, segments, setSegments, projectMediaId}) {
+export default function TextBlock({video, seekVideo, segments, setSegments, projectMediaId}) {
   let colors = ["#FF6363", "#FFAB76", "#FFFDA2", "#BAFFB4", "#FF52A2", "#A084E8", "#95BDFF", "#86C8BC"];
 
+  let words = video.words
   const getColor = () =>  {
     return colors[segments.length % colors.length];
   }
@@ -138,20 +143,7 @@ export default function TextBlock({words, seekVideo, segments, setSegments, proj
 
     return segment;
   }
-
-  const updateSegments = (segment) => {
-    setSegments((oldSegments) => {
-      let updatedSegments = oldSegments.map((oldSegment) => {
-        if (oldSegment.id == segment.id) {
-          return {...segment};
-        } else{
-          return {...oldSegment};
-        }
-      })
-      editSegments(updatedSegments);
-      return updatedSegments;
-    })
-  }
+  
 
   const mouseCement = () => {
     let chosenColor = getColor();
@@ -187,7 +179,7 @@ export default function TextBlock({words, seekVideo, segments, setSegments, proj
         ||
         ((segment.start == selectionEnd || segment.end == selectionEnd) && (segment.start <= selectionStart && selectionStart <= segment.end))) {
           let newSegment = removeSelection(segment, selectionStart, selectionEnd);
-          updateSegments(newSegment);
+          updateSegments(newSegment, setSegments);
           expansionOrRemoval = true;
       } else if (
         //Expansion
@@ -195,7 +187,7 @@ export default function TextBlock({words, seekVideo, segments, setSegments, proj
         ||
         ((segment.start == selectionEnd || segment.end == selectionEnd) && (segment.start >= selectionStart || selectionStart >= segment.end))) {
           let newSegment = expandSelection(segment, selectionStart, selectionEnd);
-          updateSegments(newSegment);
+          updateSegments(newSegment, setSegments);
           expansionOrRemoval = true;
       }   
     })
@@ -290,10 +282,40 @@ export default function TextBlock({words, seekVideo, segments, setSegments, proj
     }
   }
 
+  const [visible, setVisible] = useState("none")
+  const [x, setX] = useState(0)
+  const [y, setY] = useState(0)
+  const [currentSegment, setCurrentSegment] = useState();
+  const ref = useRef();
+  
+  const onContextMenu = (e, wordState) =>{
+    e.preventDefault();
+    setX(e.clientX);
+    setY(e.clientY);
+
+    const selectedSegments = segments.filter((segment) => {
+      return (segment.start <= wordState.index && wordState.index <= segment.end)
+    })
+    setCurrentSegment(selectedSegments[0]);
+    setVisible("flex")
+  }
+
+    useModalDismissSignal(ref, ()=> {setVisible("none")}, true);
+
+
+    const deleteSegment = ( ) => {
+      deleteSegmentDb(currentSegment.id);
+      return setSegments((array) => array.filter((segment) => {
+        return segment.id != currentSegment.id
+      }))
+    }
+
   return (
-    <div  onMouseUp={onMouseUp} onMouseMove={onMouseMove} className="content-loaded">
+    <>
+    <div onMouseUp={onMouseUp} onMouseMove={onMouseMove}  className="content-loaded">
       {wordsState.map((state)=> 
         <Word 
+          onContextMenu={(e) => { onContextMenu(e, state)}}
           onMouseDown={() => onMouseDown(state.index)}
           onMouseOver={(event) => onMouseOver(event, state.index)}
           key={state.id}
@@ -302,5 +324,13 @@ export default function TextBlock({words, seekVideo, segments, setSegments, proj
       />
       )}
     </div>
+    
+    <div ref={ref}  style={{ minWidth:"175px", flexDirection:"column", alignItems:"start", display:visible, position: "fixed", top: y-20-30, left: x, borderRadius:"5px", overflow:"hidden"}} onClick={() =>{setVisible("none")}}>
+    {currentSegment!=null ? 
+      <><EditSegmentModal setSegments={setSegments} style={{ width:"100%", borderRadius: "0px"}} segment={currentSegment} video={video}/>
+      <Button style={{width:"100%", borderRadius: "0px"}}onClick={() =>{deleteSegment();setVisible("none")}}>Delete <TrashIcon/></Button></>
+      : <></>}
+      </div>
+    </>
   )
 }

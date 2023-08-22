@@ -1,5 +1,5 @@
 import { Dialog, Button, Flex, Text, TextField,  } from '@radix-ui/themes';
-import MyPreview from '@/components/MyPreview'
+import MyPreview from '@/components/preview_modal/MyPreview'
 
 export default function PreviewModal({source}) {
   return (

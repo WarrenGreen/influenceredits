@@ -74,3 +74,18 @@ export async function deleteSegment(segmentId) {
 
   return await response.json();
 }
+
+
+export const updateSegments = (segment, setSegments) => {
+  setSegments((oldSegments) => {
+    let updatedSegments = oldSegments.map((oldSegment) => {
+      if (oldSegment.id == segment.id) {
+        return {...segment};
+      } else{
+        return {...oldSegment};
+      }
+    })
+    editSegments(updatedSegments);
+    return updatedSegments;
+  })
+}

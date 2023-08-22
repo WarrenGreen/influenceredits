@@ -36,6 +36,7 @@ render() {
 
   return (
     <span 
+      onContextMenu={this.props.onContextMenu}
       onMouseOut={this.props.onMouseOut}
       onMouseOver={this.props.onMouseOver}
       onMouseDown={this.props.onMouseDown}
