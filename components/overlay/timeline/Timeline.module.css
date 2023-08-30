@@ -1,0 +1,9 @@
+.Bar {
+  position: absolute;
+  height: 35px;
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  overflow: hidden;
+}

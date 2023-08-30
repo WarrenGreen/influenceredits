@@ -7,6 +7,7 @@ import { defaultVideos, defaultWords } from '../../helpers/utils'
 
 import { createMedia, getProjectMedia } from '@/helpers/media'
 import {getSegments, getProjectSegments} from '@/helpers/segment'
+import {getInitialSource} from '@/helpers/project'
 import {getTranscript} from '@/helpers/transcript'
 import { getThumbnail } from '@/helpers/thumbnail'
 import {useInterval} from '@/helpers/useInterval'
@@ -20,6 +21,8 @@ import { v4 as uuid } from 'uuid'
 import UploadVideo from '../../components/Upload'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { videoCreator } from '@/stores/VideoCreatorStore';
+
 
 import React from "react" 
 React.useLayoutEffect = React.useEffect 
@@ -44,16 +47,8 @@ export default function Editor({projectVideos, projectSegments, projectId}) {
   let [videos, setVideos] = useState(projectVideos);
   let [selectedVideo, setSelectedVideo] = useState(videos.length ==0? null: videos[0].id);
   const [segments, setSegments] = useState(projectSegments);
-  const defaultSource = {
-    "output_format": "mp4",
-    "width": 240,
-    "height": 135,
-    "elements": [
-      {
-      },
-    ]
-  }
-  const [source, setSource] = useState(defaultSource);
+  const initialSource = getInitialSource(projectVideos, projectSegments);
+  const [source, setSource] = useState(initialSource);
 
 
   useEffect(() => {
@@ -86,8 +81,8 @@ export default function Editor({projectVideos, projectSegments, projectId}) {
       }
     })
 
+    console.log(newSource)
     setSource(newSource);
-
   }, [segments]);
 
 

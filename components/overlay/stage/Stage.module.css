@@ -1,0 +1,46 @@
+.TopLeftButtons {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+.TopRightButtons {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.BottomLeftButtons { 
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+.BottomRightButtons {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ActionButton {
+  display: flex;
+  margin: 10px;
+  padding: 10px;
+  background: var(--violet-8);
+  border-radius: 5px;
+  cursor: pointer;
+  
+}
+
+.LoadingText { 
+  margin-right: 20px;
+  color: #a3a5a5;
+}

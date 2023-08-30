@@ -67,7 +67,7 @@ export default function OverlayPreview ({source})  {
             if (htmlElement && htmlElement !== previewRef.current?.element) {
               setUpPreview(htmlElement);
             }
-          }}></div>
+          }}></div><button onClick={ previewRef.current.play}>play</button>
       {isLoading && 
       <Flex align="center" justify="center" style={{flexGrow: 1}}>
       <Oval
@@ -81,7 +81,8 @@ export default function OverlayPreview ({source})  {
       secondaryColor=""
       strokeWidth={4}
       strokeWidthSecondary={4}
-    /></Flex>}
+    />
+    </Flex>}
     </>
   );
 };
