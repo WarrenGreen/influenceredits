@@ -41,7 +41,7 @@ export async function getSegmentFromProjectMedia(projectMediaId) {
 
 export async function getSegmentByProject(projectId) {
   let { rows, fields } = await sql`
-    SELECT segment.id, segment.start_index as start, segment.end_index as end, start_time as "timeStart", end_time as "timeEnd", color, project_media_id, index, text
+    SELECT segment.id, segment.start_index as start, segment.end_index as end, start_time as "timeStart", end_time as "timeEnd", color, project_media_id as "projectMediaId", index, text
     FROM project_media
     inner join segment on project_media.id=segment.project_media_id
     where project_media.project_id=${projectId}

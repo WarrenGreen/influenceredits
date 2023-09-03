@@ -1,0 +1,88 @@
+.MainSidePanel {
+  flex:1;
+  margin: 15px 0;
+  padding: 15px 30px;
+  background: var(--violet-4);
+  border-radius: 8px;
+  overflow-y: scroll;
+}
+
+.ScrollableArea {
+  width: auto;
+  padding: 15px 30px;
+  display: flex;
+  flex-direction: column;
+}
+
+.WelcomeScreen {
+  padding: 30px;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.LinkButton {
+  margin: 15px 0;
+  padding: 10px 0;
+  background: #292b2e;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+
+.TextSettings {
+  margin-top: 20px;
+  color: #a3a5a5;
+
+}
+
+.TextSettings:a {
+  color: #a3a5a5;
+}
+
+.TextArea{
+display: block;
+  width: 100%;
+  resize: none;
+  padding: 10px 15px;
+  margin: 10px 0;
+  color: #2b3035;
+  background: #fff;
+  border: none;
+  border-radius: 5px;
+}
+  .TextArea:focus {
+    outline: 1px solid #2a85ff;
+  }
+
+.Information  {
+  margin-top: 20px;
+  color: #a3a5a5;
+}
+
+.Information > a {
+  color: #a3a5a5;
+}
+
+.Select {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  color: #2b3035;
+  background-color: #fff;
+  border: none;
+  border-radius: 5px;
+
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 10'%3E%3Cpath d='m0.993 2.02 5.25 5.25c0.966 0.966 2.534 0.966 3.5-0l5.264-5.264' fill='none' stroke='%23fff' stroke-width='2px'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px top 50%;
+  background-size: 16px auto;
+
+}
+.Select:focus {
+  outline: 1px solid #2a85ff;
+}

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { debounce } from "../helpers/utils";
-import Word from "../components/Word";
+import { debounce } from "../../helpers/utils";
+import Word from "./Word";
 import {v4 as uuid} from "uuid";
 import {createSegment, updateSegments, deleteSegment as deleteSegmentDb} from "@/helpers/segment"
 import {useModalDismissSignal} from '@/helpers/useModalDismissSignal'
@@ -17,27 +17,27 @@ export default function TextBlock({video, seekVideo, segments, setSegments, proj
   }
 
   useEffect(() => {
-  let state = []
-  for (let index in words) {
-    state.push({
-      id: uuid(),
-      index: index,
-      selected: false,
-      selectedStart: false,
-      selectedEnd: false,
-      inRange: false,
-      rangeStart: false,
-      rangeEnd: false,
-      rangeColor: null,
-      text: words[index].text,
-      videoStart: words[index].start,
-      videoEnd: words[index].end,
-    });
-  }
-
-  setWordsState(state);
-  paintRanges()
-
+    let state = []
+    for (let index in words) {
+      state.push({
+        id: uuid(),
+        index: index,
+        selected: false,
+        selectedStart: false,
+        selectedEnd: false,
+        inRange: false,
+        rangeStart: false,
+        rangeEnd: false,
+        rangeColor: null,
+        text: words[index].text,
+        videoStart: words[index].start,
+        videoEnd: words[index].end,
+      });
+    }
+  
+    setWordsState(state);
+    paintRanges()
+  
   }, [words])
 
   useEffect(() => {
@@ -312,7 +312,7 @@ export default function TextBlock({video, seekVideo, segments, setSegments, proj
 
   return (
     <>
-    <div onMouseUp={onMouseUp} onMouseMove={onMouseMove}  className="content-loaded">
+    <div onMouseUp={onMouseUp} onMouseMove={onMouseMove}  className={"content-loaded prevent-select"}>
       {wordsState.map((state)=> 
         <Word 
           onContextMenu={(e) => { onContextMenu(e, state)}}

@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import Layout from '../../components/Layout'
-import TextBlock from '../../components/TextBlock'
-import VideoBlock from '../../components/VideoBlock'
+import TextBlock from '../../components/selection/TextBlock'
+import VideoBlock from '../../components/selection/VideoBlock'
 import Timeline from '../../components/timeline/Timeline'
 import { defaultVideos, defaultWords } from '../../helpers/utils'
 
 import { createMedia, getProjectMedia } from '@/helpers/media'
 import {getSegments, getProjectSegments} from '@/helpers/segment'
+import {getInitialSource} from '@/helpers/project'
 import {getTranscript} from '@/helpers/transcript'
 import { getThumbnail } from '@/helpers/thumbnail'
 import {useInterval} from '@/helpers/useInterval'
@@ -18,7 +19,11 @@ import { Flex } from '@radix-ui/themes'
 import { Oval } from 'react-loader-spinner'
 import { v4 as uuid } from 'uuid'
 import UploadVideo from '../../components/Upload'
+import SelectionPreview from '@/components/selection/SelectionPreview'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
+import { videoCreator } from '@/stores/VideoCreatorStore';
+
 
 import React from "react" 
 React.useLayoutEffect = React.useEffect 
@@ -43,16 +48,8 @@ export default function Editor({projectVideos, projectSegments, projectId}) {
   let [videos, setVideos] = useState(projectVideos);
   let [selectedVideo, setSelectedVideo] = useState(videos.length ==0? null: videos[0].id);
   const [segments, setSegments] = useState(projectSegments);
-  const defaultSource = {
-    "output_format": "mp4",
-    "width": 240,
-    "height": 135,
-    "elements": [
-      {
-      },
-    ]
-  }
-  const [source, setSource] = useState(defaultSource);
+  const initialSource = getInitialSource(projectVideos, projectSegments);
+  const [source, setSource] = useState(initialSource);
 
 
   useEffect(() => {
@@ -85,8 +82,8 @@ export default function Editor({projectVideos, projectSegments, projectId}) {
       }
     })
 
+    console.log(newSource)
     setSource(newSource);
-
   }, [segments]);
 
 
@@ -183,13 +180,11 @@ export default function Editor({projectVideos, projectSegments, projectId}) {
   return (
     <>
     <Layout>
-      <ProcessStatus style={{top:"0", height: "3.5rem"}} />
-    <Flex direction="row" position="fixed" style={{top:"3.5rem", bottom:"3.5rem"}} width="100%">
+      <ProcessStatus state="select" projectId={projectId} style={{top:"0", height: "3.5rem"}} />
+    <Flex direction="row" position="fixed" style={{top:"3.5rem", bottom:"5rem"}} width="100%">
       <div className="sidebar"> 
         {currentVideo != null ? <video controls ref={playerRef} src={currentVideo? currentVideo.url: null} width="100%"></video> :<div style={{height:"250px", width: "100%", backgroundColor:"gray"}}></div>}
         <UploadVideo uploadStartedCallback={uploadStartedCallback} uploadFinishedCallback={uploadFinishedCallback} />
-        <PreviewModal source={source}/>
-        <RenderModal source={source} />
         <div className="video-set">
           {videos.map((video) => {
               return <VideoBlock key={uuid()} video={video} selected={video.id == currentVideo.id} />
@@ -218,7 +213,10 @@ export default function Editor({projectVideos, projectSegments, projectId}) {
             <div>{currentVideo.status}</div>
           </div>
         :
+        <div style={{flex: 4, display:"flex", overflow: "hidden"}}>
           <TextBlock video={currentVideo} seekVideo={seekVideo} segments={segments} setSegments={setSegments} projectMediaId={currentVideo.projectMediaId} />
+          <SelectionPreview source={source} video={currentVideo} segments={segments} setSegments={setSegments} projectMediaId={currentVideo.projectMediaId}/>
+        </div>
         )
       }
       

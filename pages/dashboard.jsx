@@ -20,7 +20,6 @@ export default function Dashboard({host}) {
   const createProjectEvent = () => {
     createProject().then((newProjectRows) => {
       let url = host + "/selection/"+newProjectRows[0].id
-      console.log(url)
       router.push(url)
     });
     

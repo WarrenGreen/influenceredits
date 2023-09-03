@@ -1,0 +1,15 @@
+.TextArea {
+  display: block;
+  width: 100%;
+  resize: none;
+  padding: 10px 15px;
+  margin: 10px 0;
+  color: #fff;
+  background: var(--violet-10);
+  border: none;
+  border-radius: 5px;
+}
+
+.TextArea:focus {
+    outline: 1px solid #2a85ff;
+  }
