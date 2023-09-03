@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Layout from '../../components/Layout'
-import TextBlock from '../../components/TextBlock'
-import VideoBlock from '../../components/VideoBlock'
+import TextBlock from '../../components/selection/TextBlock'
+import VideoBlock from '../../components/selection/VideoBlock'
 import Timeline from '../../components/timeline/Timeline'
 import { defaultVideos, defaultWords } from '../../helpers/utils'
 

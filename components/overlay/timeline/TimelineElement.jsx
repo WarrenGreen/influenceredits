@@ -55,8 +55,10 @@ export const TimelineElement = observer((props) => {
               videoCreator.setActiveElements(props.element.source.id);
             }}
           >
-            {props.element.source.name ??
-              props.element.source.type[0].toUpperCase() + props.element.source.type.slice(1)}
+            <div style={{padding: "10px"}}>
+              {props.element.source.name ??
+                props.element.source.type[0].toUpperCase() + props.element.source.type.slice(1)}
+            </div>
           </div>
         )}
       </Draggable>

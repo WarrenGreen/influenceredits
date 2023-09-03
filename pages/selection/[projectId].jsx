@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Layout from '../../components/Layout'
-import TextBlock from '../../components/TextBlock'
-import VideoBlock from '../../components/VideoBlock'
+import TextBlock from '../../components/selection/TextBlock'
+import VideoBlock from '../../components/selection/VideoBlock'
 import Timeline from '../../components/timeline/Timeline'
 import { defaultVideos, defaultWords } from '../../helpers/utils'
 
@@ -19,6 +19,7 @@ import { Flex } from '@radix-ui/themes'
 import { Oval } from 'react-loader-spinner'
 import { v4 as uuid } from 'uuid'
 import UploadVideo from '../../components/Upload'
+import SelectionPreview from '@/components/selection/SelectionPreview'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { videoCreator } from '@/stores/VideoCreatorStore';
@@ -180,12 +181,10 @@ export default function Editor({projectVideos, projectSegments, projectId}) {
     <>
     <Layout>
       <ProcessStatus state="select" projectId={projectId} style={{top:"0", height: "3.5rem"}} />
-    <Flex direction="row" position="fixed" style={{top:"3.5rem", bottom:"3.5rem"}} width="100%">
+    <Flex direction="row" position="fixed" style={{top:"3.5rem", bottom:"5rem"}} width="100%">
       <div className="sidebar"> 
         {currentVideo != null ? <video controls ref={playerRef} src={currentVideo? currentVideo.url: null} width="100%"></video> :<div style={{height:"250px", width: "100%", backgroundColor:"gray"}}></div>}
         <UploadVideo uploadStartedCallback={uploadStartedCallback} uploadFinishedCallback={uploadFinishedCallback} />
-        <PreviewModal source={source}/>
-        <RenderModal source={source} />
         <div className="video-set">
           {videos.map((video) => {
               return <VideoBlock key={uuid()} video={video} selected={video.id == currentVideo.id} />
@@ -214,7 +213,10 @@ export default function Editor({projectVideos, projectSegments, projectId}) {
             <div>{currentVideo.status}</div>
           </div>
         :
+        <div style={{flex: 4, display:"flex", overflow: "hidden"}}>
           <TextBlock video={currentVideo} seekVideo={seekVideo} segments={segments} setSegments={setSegments} projectMediaId={currentVideo.projectMediaId} />
+          <SelectionPreview source={source} video={currentVideo} segments={segments} setSegments={setSegments} projectMediaId={currentVideo.projectMediaId}/>
+        </div>
         )
       }
       
