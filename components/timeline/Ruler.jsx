@@ -31,6 +31,6 @@ export default function Ruler ({contentWidth}) {
     }
   }, [contentWidth])
   return (
-    <canvas height="25" style={{flex:1, backgroundColor: "#E0E0E0" , width:contentWidth+"px"}} width={contentWidth} ref={canvasRef} />
+    <canvas height="25" style={{flex:1 , width:contentWidth+"px"}} width={contentWidth} ref={canvasRef} />
   )
 }

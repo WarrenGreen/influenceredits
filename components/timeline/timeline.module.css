@@ -5,10 +5,11 @@
   right: 0;
   height: 5rem;
   overflow-x: scroll;
-  background-color:  #E0E0E0;
+  background-color:  white;
   display:flex;
   flex-direction: column;
   align-items: stretch;
+  border-top: #404040 solid 4px
 }
 
 .sortable {
