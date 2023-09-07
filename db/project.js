@@ -6,6 +6,6 @@ export async function insertProject(name, userId) {
 }
 
 export async function getUserEmail(projectId) {
-  let { rows, fields } = await sql`SELECT email from user inner join project on user.id=project.user_id where project.id=${projectId}`;
+  let { rows, fields } = await sql`SELECT email from public."user" inner join project on public."user".id=project.user_id where project.id=${projectId}`;
   return rows[0]
 }
