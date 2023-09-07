@@ -19,6 +19,7 @@ import UploadVideo from '@/components/app/Upload'
 import SelectionPreview from '@/components/app/selection/SelectionPreview'
 
 import { useSession } from "next-auth/react"
+import { getServerSession } from "next-auth/next"
 import AccessDenied from '@/components/accessDenied'
 
 
