@@ -3,7 +3,8 @@ import '@radix-ui/themes/styles.css';
 import RootLayout from './layout'
 import '@/styles/global.css'
 import { Inter, Lexend } from 'next/font/google'
-import { Provider } from '@next-auth/client'
+import { SessionProvider } from "next-auth/react"
+
 
 export const inter = Inter({
   subsets: ['latin'],
@@ -20,7 +21,7 @@ export const lexend = Lexend({
 
 function MyApp({ Component, pageProps }) {
   return (
-    <Provider session={pageProps.session}>
+    <SessionProvider session={pageProps.session}>
       <main className={`${inter.variable} font-sans ${lexend.variable}`} style={{height: "100%"}}>
         <style global jsx>{`
           html,
@@ -33,7 +34,7 @@ function MyApp({ Component, pageProps }) {
         `}</style>
         <Component {...pageProps} />
       </main>
-    </Provider>
+    </SessionProvider>
   )
 }
 
