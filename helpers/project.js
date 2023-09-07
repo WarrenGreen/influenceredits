@@ -57,3 +57,20 @@ export function getInitialSource(projectVideos, projectSegments) {
   return initialSource;
 
 }
+
+export async function getProjectUserEmail(projectId) {
+  const response = await fetch(process.env.NEXT_PUBLIC_HOST + '/api/project/' + projectId +'/user', {
+    method: 'GET',
+  });
+
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('No API key was provided. Please refer to the README.md for instructions.');
+    } else {
+      throw new Error(`The request failed with status code ${response.status}`);
+    }
+  }
+
+  return await response.json();
+}

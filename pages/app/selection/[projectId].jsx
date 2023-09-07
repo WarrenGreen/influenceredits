@@ -6,7 +6,7 @@ import Timeline from '@/components/app/timeline/Timeline'
 
 import { createMedia, getProjectMedia } from '@/helpers/media'
 import {getSegments, getProjectSegments} from '@/helpers/segment'
-import {getInitialSource} from '@/helpers/project'
+import {getInitialSource, getProjectUserEmail} from '@/helpers/project'
 import {getTranscript} from '@/helpers/transcript'
 import { getThumbnail } from '@/helpers/thumbnail'
 import {useInterval} from '@/helpers/useInterval'
@@ -36,6 +36,7 @@ export const getServerSideProps = async (context) => {
     props: {
       projectVideos: await getProjectMedia(projectId),
       projectSegments: await getProjectSegments(projectId),
+      userEmail: await getProjectUserEmail(projectId),
       projectId,
       session: await getServerSession(context.req, context.res, authOptions)
     },
@@ -43,7 +44,7 @@ export const getServerSideProps = async (context) => {
   
 }
 
-export default function Editor({session, projectVideos, projectSegments, projectId}) {
+export default function Editor({session, userEmail, projectVideos, projectSegments, projectId}) {
 
   let playerRef = useRef();
 
@@ -181,6 +182,7 @@ export default function Editor({session, projectVideos, projectSegments, project
 
   // If no session exists, display access denied message
   if (!session) { return  <Layout><AccessDenied/></Layout> }
+  else if (session.user.email!=userEmail) {return  <Layout><AccessDenied/></Layout>}
 
   return (
     <>
