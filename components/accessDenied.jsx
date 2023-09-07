@@ -1,4 +1,5 @@
 import { signIn } from '@next-auth/client'
+import Link from 'next/link'
 
 export default function AccessDenied () {
   return (

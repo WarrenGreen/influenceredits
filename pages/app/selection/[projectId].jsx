@@ -41,11 +41,6 @@ export const getServerSideProps = async ({ params }) => {
 
 export default function Editor({projectVideos, projectSegments, projectId}) {
   const [ session, loading ] = useSession()
-   // When rendering client side don't display anything until loading is complete
-   if (typeof window !== 'undefined' && loading) return null
-
-   // If no session exists, display access denied message
-   if (!session) { return  <Layout><AccessDenied/></Layout> }
 
   let playerRef = useRef();
 
@@ -181,6 +176,11 @@ export default function Editor({projectVideos, projectSegments, projectId}) {
   }
   const [currentVideo, setCurrentVideo] = useState(currentVideo_beta)
 
+  // When rendering client side don't display anything until loading is complete
+  if (typeof window !== 'undefined' && loading) return null
+
+  // If no session exists, display access denied message
+  if (!session) { return  <Layout><AccessDenied/></Layout> }
 
   return (
     <>
