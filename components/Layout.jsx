@@ -5,11 +5,9 @@ export default function Layout ({children}) {
   return (
     <>
       <Head>
-        <title>influencer edits</title>
+        <title>AdEditor</title>
       </Head>
-      <Theme accentColor="violet">
       {children}
-      </Theme>
     </>
   )
 }
