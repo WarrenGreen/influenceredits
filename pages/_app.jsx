@@ -3,7 +3,7 @@ import '@radix-ui/themes/styles.css';
 import RootLayout from './layout'
 import '@/styles/global.css'
 import { Inter, Lexend } from 'next/font/google'
-import { Provider } from 'next-auth/client'
+import { Provider } from '@next-auth/client'
 
 export const inter = Inter({
   subsets: ['latin'],
