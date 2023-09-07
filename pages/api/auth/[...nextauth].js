@@ -29,7 +29,7 @@ export const authOptions = {
         keyId: process.env.APPLE_KEY_ID,
       },
     }),
-    */
+    
     FacebookProvider({
       clientId: process.env.FACEBOOK_ID,
       clientSecret: process.env.FACEBOOK_SECRET,
@@ -37,12 +37,12 @@ export const authOptions = {
     GithubProvider({
       clientId: process.env.GITHUB_ID,
       clientSecret: process.env.GITHUB_SECRET,
-    }),
+    }),*/
     GoogleProvider({
       clientId: process.env.GOOGLE_ID,
       clientSecret: process.env.GOOGLE_SECRET,
     }),
-    TwitterProvider({
+    /*TwitterProvider({
       clientId: process.env.TWITTER_ID,
       clientSecret: process.env.TWITTER_SECRET,
     }),
@@ -50,7 +50,7 @@ export const authOptions = {
       clientId: process.env.AUTH0_ID,
       clientSecret: process.env.AUTH0_SECRET,
       issuer: process.env.AUTH0_ISSUER,
-    }),
+    }),*/
   ],
   theme: {
     colorScheme: "light",
