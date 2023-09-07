@@ -19,7 +19,7 @@ import UploadVideo from '@/components/app/Upload'
 import SelectionPreview from '@/components/app/selection/SelectionPreview'
 
 import { getServerSession } from "next-auth/next"
-import { authOptions } from "./api/auth/[...nextauth]"
+import { authOptions } from "@/pages/api/auth/[...nextauth]"
 import AccessDenied from '@/components/accessDenied'
 
 
