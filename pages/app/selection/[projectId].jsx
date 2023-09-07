@@ -18,6 +18,10 @@ import { v4 as uuid } from 'uuid'
 import UploadVideo from '@/components/app/Upload'
 import SelectionPreview from '@/components/app/selection/SelectionPreview'
 
+import { useSession } from 'next-auth/client'
+import Layout from '../components/layout'
+import AccessDenied from '../components/access-denied'
+
 
 import React from "react" 
 React.useLayoutEffect = React.useEffect 
@@ -37,6 +41,13 @@ export const getServerSideProps = async ({ params }) => {
 }
 
 export default function Editor({projectVideos, projectSegments, projectId}) {
+  const [ session, loading ] = useSession()
+   // When rendering client side don't display anything until loading is complete
+   if (typeof window !== 'undefined' && loading) return null
+
+   // If no session exists, display access denied message
+   if (!session) { return  <Layout><AccessDenied/></Layout> }
+
   let playerRef = useRef();
 
   let [videos, setVideos] = useState(projectVideos);
