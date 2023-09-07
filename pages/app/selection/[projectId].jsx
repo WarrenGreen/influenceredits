@@ -27,20 +27,22 @@ React.useLayoutEffect = React.useEffect
 
 
 
-export const getServerSideProps = async ({ params }) => {
-  if (typeof params.projectId != "string" || params.projectId == "[object Object]") return {props: {projectVideos: []}}
-  const projectId = params.projectId
-  let projectVideos = await getProjectMedia(projectId)
-  let projectSegments = await getProjectSegments(projectId);
+export const getServerSideProps = async (context) => {
+  if (typeof context.params.projectId != "string" || context.params.projectId == "[object Object]") return {props: {projectVideos: []}}
+  const projectId = context.params.projectId
 
   return {
-    props: {projectVideos, projectSegments, projectId},
+    props: {
+      projectVideos: await getProjectMedia(projectId),
+      projectSegments: await getProjectSegments(projectId),
+      projectId,
+      session: await getServerSession(context.req, context.res, authOptions)
+    },
   }
   
 }
 
-export default function Editor({projectVideos, projectSegments, projectId}) {
-  const [ session, loading ] = useSession()
+export default function Editor({session, projectVideos, projectSegments, projectId}) {
 
   let playerRef = useRef();
 
