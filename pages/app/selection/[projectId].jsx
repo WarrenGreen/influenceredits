@@ -182,7 +182,7 @@ export default function Editor({session, userEmail, projectVideos, projectSegmen
 
   // If no session exists, display access denied message
   if (!session) { return  <Layout><AccessDenied/></Layout> }
-  else if (session.user.email!=userEmail) {return  <Layout><AccessDenied/></Layout>}
+  else if (session.user.email!=userEmail) { console.log(session.user.email);return  <Layout><AccessDenied/></Layout>}
 
   return (
     <>
