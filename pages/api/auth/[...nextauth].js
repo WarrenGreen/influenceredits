@@ -54,6 +54,9 @@ export const authOptions = {
   ],
   theme: {
     colorScheme: "light",
+    brandColor: "#9333ea", // Hex color code
+    logo: "/logo.svg", // Absolute URL to image
+    // buttonText: "" // Hex color code
   },
   callbacks: {
     async jwt({ token }) {
