@@ -1,8 +1,22 @@
 import { sql } from '@vercel/postgres';
 
-export async function insertProject(name, userId) {
-  let { rows, fields } = await sql`INSERT INTO project ("name", "user_id") VALUES (${name}, ${userId}) RETURNING *`;
-  return rows
+export async function insertProject(supabase, name, userId) {
+  const { data, error } = await supabase
+    .from('project')
+    .insert([
+      {
+        name: name,
+        user_id: userId,
+      },
+    ])
+    .returning('*');
+
+  if (error) {
+    console.error('Error inserting data:', error.message);
+    return;
+  }
+
+  return data[0]
 }
 
 export async function getUserEmail(projectId) {

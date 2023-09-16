@@ -4,12 +4,18 @@ import { Button } from '@/components/Button'
 import { SelectField, TextField } from '@/components/Fields'
 import { Logo } from '@/components/Logo'
 import { SlimLayout } from '@/components/SlimLayout'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
+import {createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import {useUser} from '@supabase/auth-helpers-react'
 
 export const metadata = {
   title: 'Sign Up',
 }
 
 export default function Register() {
+  const supabaseClient = createClientComponentClient()
+  const user = useUser()
   return (
     <SlimLayout>
       <div className="flex">
@@ -30,49 +36,13 @@ export default function Register() {
         </Link>{' '}
         to your account.
       </p>
-      <form
-        action="#"
-        className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2"
-      >
-        <TextField
-          label="First name"
-          name="first_name"
-          type="text"
-          autoComplete="given-name"
-          required
-        />
-        <TextField
-          label="Last name"
-          name="last_name"
-          type="text"
-          autoComplete="family-name"
-          required
-        />
-        <TextField
-          className="col-span-full"
-          label="Email address"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-        />
-        <TextField
-          className="col-span-full"
-          label="Password"
-          name="password"
-          type="password"
-          autoComplete="new-password"
-          required
-        />
-
-        <div className="col-span-full">
-          <Button type="submit" variant="solid" color="purple" className="w-full">
-            <span>
-              Sign up <span aria-hidden="true">&rarr;</span>
-            </span>
-          </Button>
-        </div>
-      </form>
+      <Auth
+        redirectTo="https://www.adeditor.io/app/dashboard"
+        appearance={{ theme: ThemeSupa }}
+        supabaseClient={supabaseClient}
+        providers={['google']}
+        socialLayout="horizontal"
+      />
     </SlimLayout>
   )
 }

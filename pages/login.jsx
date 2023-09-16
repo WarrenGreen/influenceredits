@@ -4,12 +4,17 @@ import { Button } from '@/components/Button'
 import { TextField } from '@/components/Fields'
 import { Logo } from '@/components/Logo'
 import { SlimLayout } from '@/components/SlimLayout'
-
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
+import {createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import {useUser} from '@supabase/auth-helpers-react'
 export const metadata = {
   title: 'Sign In',
 }
 
 export default function Login() {
+  const supabaseClient = createClientComponentClient()
+  const user = useUser()
   return (
     <SlimLayout>
       <div className="flex">
@@ -30,29 +35,13 @@ export default function Login() {
         </Link>{' '}
         for a free trial.
       </p>
-      <form action="#" className="mt-10 grid grid-cols-1 gap-y-8">
-        <TextField
-          label="Email address"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-        />
-        <TextField
-          label="Password"
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          required
-        />
-        <div>
-          <Button type="submit" variant="solid" color="purple" className="w-full">
-            <span>
-              Sign in <span aria-hidden="true">&rarr;</span>
-            </span>
-          </Button>
-        </div>
-      </form>
+      <Auth
+        redirectTo="https://www.adeditor.io/app/dashboard"
+        appearance={{ theme: ThemeSupa }}
+        supabaseClient={supabaseClient}
+        providers={['google']}
+        socialLayout="horizontal"
+      />
     </SlimLayout>
   )
 }

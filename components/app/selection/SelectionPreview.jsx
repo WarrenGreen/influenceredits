@@ -40,7 +40,12 @@ export default function SelectionPreview({source, video,  segments, setSegments,
 
   return (
     <div className="preview">
-      <MyPreview source={source} />
+      {segments.length == 0 ? 
+        <div className="flex justify-center">
+          <div className="text-slate-600">Select text and your script will appear here.</div>
+        </div>
+      :
+      <><MyPreview source={source} />
       <div className="previewScript">
       {wordsState.map((state)=> 
         <Word 
@@ -53,6 +58,9 @@ export default function SelectionPreview({source, video,  segments, setSegments,
       />
       )}
       </div>
+      </>
+      }
+      
     </div>
   );
 };

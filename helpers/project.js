@@ -1,28 +1,38 @@
 import { v4 as uuid } from "uuid";
 
 
-export async function createProject(name = "New Project", userId = "88a53bfe-3cb1-11ee-9e27-6f236a9827dd") {
-  const response = await fetch('/api/project', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      "name": name,
-      "userId": userId
-    }),
-  });
+export async function createProject(supabase, name = "New Project", userId = "6a34be3e-6b08-4788-9be3-6c2c38025ea6") {
+  const { data, error } = await supabase
+    .from('project')
+    .insert([
+      {
+        name: name,
+        user_id: userId,
+      },
+    ])
+    .select()
+    .single()
 
-
-  if (!response.ok) {
-    if (response.status === 401) {
-      throw new Error('No API key was provided. Please refer to the README.md for instructions.');
-    } else {
-      throw new Error(`The request failed with status code ${response.status}`);
-    }
+  if (error) {
+    console.error('Error inserting data:', error.message);
+    return;
   }
 
-  return response.json();
+  return data
+}
+
+export async function getProjects(supabase, userId) {
+  const { data, error } = await supabase
+    .from('project')
+    .select()
+    .eq('user_id', userId)
+
+  if (error) {
+    console.error('Error inserting data:', error.message);
+    return;
+  }
+
+  return data
 }
 
 export function getInitialSource(projectVideos, projectSegments) {
@@ -48,7 +58,7 @@ export function getInitialSource(projectVideos, projectSegments) {
       "id": uuid(),
       "type": "video",
       "track": 1,
-      "trim_start": Math.max(0, segment.timeStart)/ 1000,
+      "trim_start": Math.max(0, segment.timeStart) / 1000,
       "trim_duration": Math.max(0, Math.abs(segment.timeEnd - segment.timeStart)) / 1000,
       "source": url
     }
@@ -56,21 +66,4 @@ export function getInitialSource(projectVideos, projectSegments) {
 
   return initialSource;
 
-}
-
-export async function getProjectUserEmail(projectId) {
-  const response = await fetch(process.env.NEXT_PUBLIC_HOST + '/api/project/' + projectId +'/user', {
-    method: 'GET',
-  });
-
-
-  if (!response.ok) {
-    if (response.status === 401) {
-      throw new Error('No API key was provided. Please refer to the README.md for instructions.');
-    } else {
-      throw new Error(`The request failed with status code ${response.status}`);
-    }
-  }
-
-  return await response.json();
 }

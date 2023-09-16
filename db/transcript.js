@@ -1,12 +1,16 @@
-import { sql } from '@vercel/postgres';
 
+export async function createTranscript(supabase, projectMediaId, text, words) {
 
-export async function createTranscript(projectMediaId, text, words) {
-  let { rows, fields } = await sql`INSERT INTO transcript ("project_media_id", "text", "words") VALUES (${projectMediaId}, ${text}, ${words}) `;
-  return rows, fields;
-}
+  const { error } = await supabase
+    .from("transcript")
+    .insert({
+      project_media_id: projectMediaId,
+      text: text,
+      words: words
+    })
 
-export async function getTranscript(projectMediaId) {
-  let { rows, fields } = await sql`SELECT * FROM transcript WHERE project_media_id = ${projectMediaId}`;
-  return rows;
+  if (error) {
+    console.log(error)
+    throw new Error('Error fetching data:', error.message);
+  }
 }

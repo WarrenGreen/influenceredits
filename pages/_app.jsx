@@ -1,9 +1,11 @@
 import '@radix-ui/themes/styles.css';
 
-import RootLayout from './layout'
 import '@/styles/global.css'
 import { Inter, Lexend } from 'next/font/google'
-import { SessionProvider } from "next-auth/react"
+
+import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs'
+import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { useState } from 'react'
 
 
 export const inter = Inter({
@@ -20,8 +22,12 @@ export const lexend = Lexend({
 
 
 function MyApp({ Component, pageProps }) {
+  const [supabaseClient] = useState(() => createPagesBrowserClient())
   return (
-    <SessionProvider session={pageProps.session}>
+    <SessionContextProvider
+      supabaseClient={supabaseClient}
+      initialSession={pageProps.initialSession}
+    >
       <main className={`${inter.variable} font-sans ${lexend.variable}`} style={{height: "100%"}}>
         <style global jsx>{`
           html,
@@ -34,7 +40,7 @@ function MyApp({ Component, pageProps }) {
         `}</style>
         <Component {...pageProps} />
       </main>
-    </SessionProvider>
+      </SessionContextProvider>
   )
 }
 

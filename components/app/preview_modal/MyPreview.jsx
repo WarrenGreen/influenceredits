@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Preview, PreviewState } from '@creatomate/preview';
-import {v4 as uuid} from 'uuid';
-import {Oval} from 'react-loader-spinner';
-import { Dialog, Button, Flex, Text, TextField,  } from '@radix-ui/themes';
+import Loader from '@/components/Loader'
+
 
 
 export default function MyPreview ({source})  {
@@ -68,20 +67,7 @@ export default function MyPreview ({source})  {
               setUpPreview(htmlElement);
             }
           }}></div>
-      {isLoading && 
-      <Flex align="center" justify="center" style={{flexGrow: 1}}>
-      <Oval
-      height={75}
-      width={75}
-      color="#BEADFA"
-      wrapperStyle={{}}
-      wrapperClass=""
-      visible={true}
-      aria-label='oval-loading'
-      secondaryColor=""
-      strokeWidth={4}
-      strokeWidthSecondary={4}
-    /></Flex>}
+      {isLoading && <div className="flex justify-center items-center flex-col" style={{flexGrow: 1}}><Loader /><div>Your preview is loading...</div></div>}
     </>
   );
 };

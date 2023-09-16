@@ -3,16 +3,19 @@
 
 
 
-export async function getTranscript(projectMediaId) {
+export async function getTranscript(supabase, projectMediaId) {
 
-  const response = await fetch(process.env.NEXT_PUBLIC_HOST + '/api/transcript/' + projectMediaId, {
-    method: 'GET',
-  });
+  const { data, error } = await supabase
+    .from('transcript')
+    .select('*')
+    .eq('project_media_id', projectMediaId);
 
-
-  if (!response.ok) {
-    throw new Error(`The request failed with status code ${response.status}`);
+  if (error) {
+    console.log(error)
+    throw new Error('Error fetching data:', error.message);
   }
 
-  return await response.json();
+  console.log(data)
+
+  return data;
 }

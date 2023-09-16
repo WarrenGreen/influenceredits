@@ -5,75 +5,21 @@ import {v4 as uuid} from "uuid";
 import {createSegment, updateSegments, deleteSegment as deleteSegmentDb} from "@/helpers/segment"
 import {useModalDismissSignal} from '@/helpers/useModalDismissSignal'
 import { TrashIcon } from '@radix-ui/react-icons'
-import { Button, Flex } from '@radix-ui/themes';
+import { Button } from '@radix-ui/themes';
 import EditSegmentModal from '@/components/app/edit_segment_modal/EditSegmentModal'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export default function TextBlock({video, seekVideo, segments, setSegments, projectMediaId}) {
   let colors = ["#FF6363", "#FFAB76", "#FFFDA2", "#BAFFB4", "#FF52A2", "#A084E8", "#95BDFF", "#86C8BC"];
+  let [wordsState, setWordsState] = useState([]);
 
-  let words = video.words
+  const supabase = createClientComponentClient();
+
   const getColor = () =>  {
     return colors[segments.length % colors.length];
   }
 
-  useEffect(() => {
-    let state = []
-    for (let index in words) {
-      state.push({
-        id: uuid(),
-        index: index,
-        selected: false,
-        selectedStart: false,
-        selectedEnd: false,
-        inRange: false,
-        rangeStart: false,
-        rangeEnd: false,
-        rangeColor: null,
-        text: words[index].text,
-        videoStart: words[index].start,
-        videoEnd: words[index].end,
-      });
-    }
-  
-    setWordsState(state);
-    paintRanges()
-  
-  }, [words])
-
-  useEffect(() => {
-    let state = []
-    for (let index in words) {
-      state.push({
-        id: uuid(),
-        index: index,
-        selected: false,
-        selectedStart: false,
-        selectedEnd: false,
-        inRange: false,
-        rangeStart: false,
-        rangeEnd: false,
-        rangeColor: null,
-        text: words[index].text,
-        videoStart: words[index].start,
-        videoEnd: words[index].end,
-      });
-    }
-  
-    setWordsState(oldState=>state);
-    paintRanges()
-    }, [])
-  
-  let [wordsState, setWordsState] = useState([]);
-
-  const resetSelection = () => {
-    setWordsState(oldWordState => {
-      return oldWordState.map((wordState) => {
-        return {...wordState, selected:false, selectedEnd:false, selectedStart: false }
-      })
-    })
-  }
-
-  const paintRanges = () => {
+  const paintRanges = useCallback(() => {
     setWordsState(oldWordState => {
       return oldWordState.map(state => {
           return {...state, rangeColor: null, rangeStart:false, rangeEnd:false}
@@ -97,11 +43,44 @@ export default function TextBlock({video, seekVideo, segments, setSegments, proj
         })
       })
     });
+  }, [segments])
+
+
+  useEffect(() => {
+    let state = []
+    for (let index in video.words) {
+      state.push({
+        id: uuid(),
+        index: index,
+        selected: false,
+        selectedStart: false,
+        selectedEnd: false,
+        inRange: false,
+        rangeStart: false,
+        rangeEnd: false,
+        rangeColor: null,
+        text: video.words[index].text,
+        videoStart: video.words[index].start,
+        videoEnd: video.words[index].end,
+      });
+    }
+  
+    setWordsState(oldState=>state);
+    paintRanges()
+    }, [video, paintRanges])
+  
+
+  const resetSelection = () => {
+    setWordsState(oldWordState => {
+      return oldWordState.map((wordState) => {
+        return {...wordState, selected:false, selectedEnd:false, selectedStart: false }
+      })
+    })
   }
 
   useEffect(() => {
     paintRanges();
-  }, [segments])
+  }, [segments, paintRanges])
 
   const collectText = (selectionStart, selectionEnd) => {
     let text = "";
@@ -179,7 +158,7 @@ export default function TextBlock({video, seekVideo, segments, setSegments, proj
         ||
         ((segment.start == selectionEnd || segment.end == selectionEnd) && (segment.start <= selectionStart && selectionStart <= segment.end))) {
           let newSegment = removeSelection(segment, selectionStart, selectionEnd);
-          updateSegments(newSegment, setSegments);
+          updateSegments(supabase, newSegment, setSegments);
           expansionOrRemoval = true;
       } else if (
         //Expansion
@@ -187,7 +166,7 @@ export default function TextBlock({video, seekVideo, segments, setSegments, proj
         ||
         ((segment.start == selectionEnd || segment.end == selectionEnd) && (segment.start >= selectionStart || selectionStart >= segment.end))) {
           let newSegment = expandSelection(segment, selectionStart, selectionEnd);
-          updateSegments(newSegment, setSegments);
+          updateSegments(supabase, newSegment, setSegments);
           expansionOrRemoval = true;
       }   
     })
@@ -208,7 +187,7 @@ export default function TextBlock({video, seekVideo, segments, setSegments, proj
     };
     setSegments(oldRange => {
       range['index'] = oldRange.length;
-      createSegment(range)
+      createSegment(supabase, range)
       return [...oldRange, range];
     });
     // End segment creation
@@ -304,7 +283,7 @@ export default function TextBlock({video, seekVideo, segments, setSegments, proj
 
 
     const deleteSegment = ( ) => {
-      deleteSegmentDb(currentSegment.id);
+      deleteSegmentDb(supabase, currentSegment.id);
       return setSegments((array) => array.filter((segment) => {
         return segment.id != currentSegment.id
       }))
@@ -312,24 +291,34 @@ export default function TextBlock({video, seekVideo, segments, setSegments, proj
 
   return (
     <>
-    <div onMouseUp={onMouseUp} onMouseMove={onMouseMove}  className={"content-loaded prevent-select"}>
-      {wordsState.map((state)=> 
-        <Word 
-          onContextMenu={(e) => { onContextMenu(e, state)}}
-          onMouseDown={() => onMouseDown(state.index)}
-          onMouseOver={(event) => onMouseOver(event, state.index)}
-          key={state.id}
-          state={state}
-          seekVideo={seekVideoWrapper}
-      />
-      )}
-    </div>
+      
+      <div onMouseUp={onMouseUp} onMouseMove={onMouseMove}  className={"content-loaded prevent-select"}>
+      {video.words ? 
+        wordsState.map((state)=> 
+          <Word 
+            onContextMenu={(e) => { onContextMenu(e, state)}}
+            onMouseDown={() => onMouseDown(state.index)}
+            onMouseOver={(event) => onMouseOver(event, state.index)}
+            key={state.id}
+            state={state}
+            seekVideo={seekVideoWrapper}
+        />
+        )
+        :
+        <></>
+      }
+      </div>
+      
     
-    <div ref={ref}  style={{ minWidth:"175px", flexDirection:"column", alignItems:"start", display:visible, position: "fixed", top: y-20-30, left: x, borderRadius:"5px", overflow:"hidden"}} onClick={() =>{setVisible("none")}}>
-    {currentSegment!=null ? 
-      <><EditSegmentModal setSegments={setSegments} style={{ width:"100%", borderRadius: "0px"}} segment={currentSegment} video={video}/>
-      <Button style={{width:"100%", borderRadius: "0px"}}onClick={() =>{deleteSegment();setVisible("none")}}>Delete <TrashIcon/></Button></>
-      : <></>}
+      <div ref={ref}  style={{ minWidth:"175px", flexDirection:"column", alignItems:"start", display:visible, position: "fixed", top: y-20-30, left: x, borderRadius:"5px", overflow:"hidden"}} onClick={() =>{setVisible("none")}}>
+      {currentSegment!=null ? 
+        <>
+          <EditSegmentModal setSegments={setSegments} style={{ width:"100%", borderRadius: "0px"}} segment={currentSegment} video={video}/>
+          <Button style={{width:"100%", borderRadius: "0px"}}onClick={() =>{deleteSegment();setVisible("none")}}>Delete <TrashIcon/></Button>
+        </>
+      : 
+        <></>
+      }
       </div>
     </>
   )

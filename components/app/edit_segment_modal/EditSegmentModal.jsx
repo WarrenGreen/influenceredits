@@ -6,9 +6,11 @@ import ReactSlider from 'react-slider'
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {updateSegments} from '@/helpers/segment'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 
 export default function EditSegmentModal({style, segment, setSegments, video}) {
+  const supabase = createClientComponentClient()
   const [startStop, setStartStop] = useState([segment.timeStart / 1000, segment.timeEnd / 1000])
   useEffect(()=>{
     reset();
@@ -89,7 +91,7 @@ const save = () => {
   let editedSegment = {...segment};
   editedSegment.timeStart = Math.round(startStop[0]*1000);
   editedSegment.timeEnd = Math.round(startStop[1]*1000);
-  updateSegments(editedSegment, setSegments)
+  updateSegments(supabase, editedSegment, setSegments)
 }
 
 const limitsBuffer = Math.min(5, Math.max(1, ((segment.timeEnd - segment.timeStart)/1000)))

@@ -76,10 +76,10 @@ export function PrimaryFeatures() {
       <Container className="relative">
         <div className="max-w-2xl md:mx-auto md:text-center xl:max-w-none">
           <h2 className="font-display text-3xl tracking-tight text-white sm:text-4xl md:text-5xl">
-            Everything you need to make quality ads.
+            Everything you need to reuse your user content.
           </h2>
           <p className="mt-6 text-lg tracking-tight text-purple-100">
-            Splice existing footage quickly find formats that win.
+            Splice existing footage quickly to find formats that win.
           </p>
         </div>
         <Tab.Group

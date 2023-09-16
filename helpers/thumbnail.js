@@ -1,16 +1,19 @@
 
 
 
-export async function getThumbnail(videoId) {
+export async function getThumbnail(supabase, videoId) {
 
-  const response = await fetch(process.env.NEXT_PUBLIC_HOST + '/api/thumbnail/' + videoId, {
-    method: 'GET',
-  });
+  const { data, error } = await supabase
+    .from('media')
+    .select(
+      `thumbnail`
+    )
+    .eq('id', videoId);
 
-
-  if (!response.ok) {
-    throw new Error(`The request failed with status code ${response.status}`);
+  if (error) {
+    console.log(error)
+    throw new Error('Error fetching data:', error.message);
   }
 
-  return await response.json();
+  return data;
 }

@@ -6,7 +6,7 @@ import Timeline from '@/components/app/timeline/Timeline'
 
 import { createMedia, getProjectMedia } from '@/helpers/media'
 import {getSegments, getProjectSegments} from '@/helpers/segment'
-import {getInitialSource, getProjectUserEmail} from '@/helpers/project'
+import {getInitialSource} from '@/helpers/project'
 import {getTranscript} from '@/helpers/transcript'
 import { getThumbnail } from '@/helpers/thumbnail'
 import {useInterval} from '@/helpers/useInterval'
@@ -17,45 +17,58 @@ import { Oval } from 'react-loader-spinner'
 import { v4 as uuid } from 'uuid'
 import UploadVideo from '@/components/app/Upload'
 import SelectionPreview from '@/components/app/selection/SelectionPreview'
+import Loader from '@/components/Loader'
 
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/pages/api/auth/[...nextauth]"
-import AccessDenied from '@/components/accessDenied'
-
+import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 import React from "react" 
 React.useLayoutEffect = React.useEffect 
 
-
-
 export const getServerSideProps = async (context) => {
+
+  // Create authenticated Supabase Client
+  const supabase = createPagesServerClient(context)
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session)
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
   if (typeof context.params.projectId != "string" || context.params.projectId == "[object Object]") return {props: {projectVideos: []}}
   const projectId = context.params.projectId
 
   return {
     props: {
-      projectVideos: await getProjectMedia(projectId),
-      projectSegments: await getProjectSegments(projectId),
-      userEmail: await getProjectUserEmail(projectId),
+      projectVideos: await getProjectMedia(supabase, projectId),
+      projectSegments: await getProjectSegments(supabase, projectId),
       projectId,
-      session: await getServerSession(context.req, context.res, authOptions)
+      initialSession: session,
+      user: session.user,
     },
   }
   
 }
 
-export default function Editor({session, userEmail, projectVideos, projectSegments, projectId}) {
-
+export default function Editor({initialSession, user, projectVideos, projectSegments, projectId}) {
+  const supabaseClient = createClientComponentClient()
   let playerRef = useRef();
 
   let [videos, setVideos] = useState(projectVideos);
-  let [selectedVideo, setSelectedVideo] = useState(videos.length ==0? null: videos[0].id);
   const [segments, setSegments] = useState(projectSegments);
   const initialSource = getInitialSource(projectVideos, projectSegments);
   const [source, setSource] = useState(initialSource);
 
-
   useEffect(() => {
+    if (videos[0] == undefined) {
+      return 
+    }
     const newSource = {...source};
     newSource["elements"] = segments.map((segment) => {
       
@@ -85,7 +98,6 @@ export default function Editor({session, userEmail, projectVideos, projectSegmen
       }
     })
 
-    console.log(newSource)
     setSource(newSource);
   }, [segments]);
 
@@ -97,7 +109,7 @@ export default function Editor({session, userEmail, projectVideos, projectSegmen
   const refreshThumbnails = async () => {
     videos.map(async (video) =>{ 
       if (video.thumbnail == null || video.thumbnail == "") {
-        let thumbnailUrl = await getThumbnail(video.id)
+        let thumbnailUrl = await getThumbnail(supabaseClient, video.id)
           if (thumbnailUrl){
             setVideos(videos => videos.map((currentVideo) => {
               if (currentVideo.id == video.id) {
@@ -113,16 +125,8 @@ export default function Editor({session, userEmail, projectVideos, projectSegmen
 
   async function refreshWords()  {
     videos.map(async (video) =>{ 
-        if (video.projectMediaId != null && video.loading) {
-          let transcript = await getTranscript(video.projectMediaId)
-            if (transcript.length <=0 || !transcript[0].words) return;
-            setVideos(videos => videos.map((currentVideo) => {
-              if (currentVideo.id == video.id) {
-                return {...video, words:transcript[0].words, status:"loaded", loading: false};
-              }else{
-                return {...currentVideo};
-              }
-            }));
+        if (video.projectMediaId != null && !video.words) {
+          setVideos( await getProjectMedia(supabaseClient, projectId))
         }
     })
   }
@@ -134,15 +138,10 @@ export default function Editor({session, userEmail, projectVideos, projectSegmen
 
   const uploadFinishedCallback = (video) => {
     
-    createMedia(video,  projectId).then((newVideo) => {
+    createMedia(supabaseClient, video,  projectId, user.id).then((newVideo) => {
     setVideos(videos => videos.map((currentVideo) => {
-      if (currentVideo.id == newVideo.id) {
         return {...newVideo, status:"transcribing"};
-      }else{
-        return {...currentVideo};
-      }
     }));
-    setSelectedVideo(video.id)
     playerRef.current.src=video.url;
     //setSource({
     //  "output_format": "mp4",
@@ -165,70 +164,48 @@ export default function Editor({session, userEmail, projectVideos, projectSegmen
   }
 
   const uploadStartedCallback = (video) => {
-    setCurrentVideo(video)
     setVideos(videos => [...videos, video]);
-    setSelectedVideo(video.id);
-
   }
 
 
-  let currentVideo_beta = null;
-  for (let index in videos) {
-    if (selectedVideo == videos[index].id) {
-      currentVideo_beta = videos[index]
-    }
-  }
-  const [currentVideo, setCurrentVideo] = useState(currentVideo_beta)
-
-  // If no session exists, display access denied message
-  if (!session) { return  <Layout><AccessDenied/></Layout> }
-  else if (session.user.email!=userEmail.email) { console.log(session.user.email);console.log(userEmail);return  <Layout><AccessDenied/></Layout>}
 
   return (
     <>
     <Layout>
+      <div className='flex flex-col' style={{height: "100%"}}>
       <ProcessStatus state="select" projectId={projectId} style={{top:"0", height: "3.5rem"}} />
-    <Flex direction="row" position="fixed" style={{top:"3.5rem", bottom:"3.5rem"}} width="100%">
+    <div className='flex' style={{flex: 1}} width="100%">
       <div className="sidebar"> 
-        {currentVideo != null ? <video controls ref={playerRef} src={currentVideo? currentVideo.url: null} width="100%"></video> :<div style={{height:"250px", width: "100%", backgroundColor:"gray"}}></div>}
-        <UploadVideo uploadStartedCallback={uploadStartedCallback} uploadFinishedCallback={uploadFinishedCallback} />
+        {videos.length ? <video controls ref={playerRef} src={videos.length? videos[0].url: null} width="100%"></video> :<div style={{height:"250px", width: "100%", backgroundColor:"gray"}}></div>}
         <div className="video-set">
           {videos.map((video) => {
-              return <VideoBlock key={uuid()} video={video} selected={video.id == currentVideo.id} />
+              return <VideoBlock key={uuid()} video={video} selected={true} />
           })}
         </div>
 		  </div>
 
       
       {
-      currentVideo == null ? 
+      videos.length ==0 ? 
         <></>
       : 
-        (currentVideo.loading ? 
-          <div className="content-loading">
-            <Oval
-            height={50}
-            width={50}
-            color="#BEADFA"
-            wrapperStyle={{}}
-            wrapperClass=""
-            visible={true}
-            aria-label='oval-loading'
-            secondaryColor=""
-            strokeWidth={4}
-            strokeWidthSecondary={4}/>
-            <div>{currentVideo.status}</div>
+        (!videos[0].words ? 
+          <div className="flex flex-col items-center justify-center" style={{flex: 4}}>
+            <Loader />
+            <div className="text-6xl p-10">Transcribing.</div>
+            <div className="text-s text-slate-600">This could take a few moments so grab a coffee or switch tabs. We&apos;ll be here.</div>
           </div>
         :
         <div style={{flex: 4, display:"flex", overflow: "hidden"}}>
-          <TextBlock video={currentVideo} seekVideo={seekVideo} segments={segments} setSegments={setSegments} projectMediaId={currentVideo.projectMediaId} />
-          <SelectionPreview source={source} video={currentVideo} segments={segments} setSegments={setSegments} projectMediaId={currentVideo.projectMediaId}/>
+          <TextBlock supabaseClient={supabaseClient} video={videos[0]} seekVideo={seekVideo} segments={segments} setSegments={setSegments} projectMediaId={videos[0].projectMediaId} />
+          <SelectionPreview source={source} video={videos[0]} segments={segments} setSegments={setSegments} projectMediaId={videos[0].projectMediaId}/>
         </div>
         )
       }
       
-    </Flex>
-    <Timeline video={currentVideo} segments={segments} setSegments={setSegments} x></Timeline>
+    </div>
+    <Timeline supabase={supabaseClient} video={videos[0]} segments={segments} setSegments={setSegments}></Timeline>
+    </div>
     </Layout>
   </>
       

@@ -1,11 +1,7 @@
 .trackbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
   height: 3.5rem;
   overflow-x: scroll;
-  background-color:  white;
+  background-color: #f1f5f9;
   display:flex;
   flex-direction: column;
   align-items: stretch;

@@ -19,18 +19,13 @@ export function Hero() {
           </svg>
           <span className="relative">made simple</span>
         </span>{' '}
-        for data driven marketers.
+        using your existing assets.
       </h1>
       <p className="mx-auto mt-6 max-w-2xl text-lg tracking-tight text-slate-700">
-        Data driven marketing requires heaps of assets. AI powered tools makes it fast, cheap and simple to reuse UGC, testimonials and user stories.
+        Data driven marketing requires heaps of assets. AI powered tools make it easy to reuse UGC, testimonials and user stories.
       </p>
       <div className="mt-10 flex justify-center gap-x-6">
-        <Button href="/api/auth/signin"
-          onClick={(e) => {
-            e.preventDefault()
-            signIn()
-          }}
-        >Try it now</Button>
+        <Button href="/register">Try it now</Button>
         <Button
           href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
           variant="outline"

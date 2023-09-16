@@ -1,6 +1,5 @@
 'use client'
 
-import { Fragment } from 'react'
 import Link from 'next/link'
 import { Popover, Transition } from '@headlessui/react'
 import clsx from 'clsx'
@@ -9,6 +8,9 @@ import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
 import { Logo } from '@/components/Logo'
 import { NavLink } from '@/components/NavLink'
+import { Fragment } from 'react'
+import {createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import ProfileMenu from '@/components/ProfileMenu'
 
 function MobileNavLink({ href, children }) {
   return (
@@ -80,10 +82,9 @@ function MobileNavigation() {
             className="absolute inset-x-0 top-full mt-4 flex origin-top flex-col rounded-2xl bg-white p-4 text-lg tracking-tight text-slate-900 shadow-xl ring-1 ring-slate-900/5"
           >
             <MobileNavLink href="#features">Features</MobileNavLink>
-            <MobileNavLink href="#testimonials">Testimonials</MobileNavLink>
             <MobileNavLink href="#pricing">Pricing</MobileNavLink>
             <hr className="m-2 border-slate-300/40" />
-            <MobileNavLink href="/login">Sign in</MobileNavLink>
+            <MobileNavLink href="/app/dashboard">Dashboard</MobileNavLink>
           </Popover.Panel>
         </Transition.Child>
       </Transition.Root>
@@ -91,7 +92,27 @@ function MobileNavigation() {
   )
 }
 
-export function Header() {
+export function SessionHeader() {
+  const supabase = createClientComponentClient()
+  
+  
+  const user = {
+    name: 'Tom Cook',
+    email: 'tom@example.com',
+    imageUrl:
+      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+  }
+
+  const userNavigation = [
+    // { name: 'Your Profile', href: '#' },
+    // { name: 'Settings', href: '#' },
+    { name: 'Sign out', href:'/', onClick:  async () => await supabase.auth.signOut() },
+  ]
+  
+  function classNames(...classes) {
+    return classes.filter(Boolean).join(' ')
+  }
+      
   return (
     <header className="py-10">
       <Container>
@@ -107,14 +128,13 @@ export function Header() {
             </div>
           </div>
           <div className="flex items-center gap-x-5 md:gap-x-8">
-            <div className="hidden md:block">
-              <NavLink href="/login">Sign in</NavLink>
-            </div>
-            <Button href="/register" color="purple">
+          <Button href="/app/dashboard" color="purple">
               <span>
-                Get started <span className="hidden lg:inline">today</span>
+                Dashboard
               </span>
             </Button>
+            <ProfileMenu />
+      
             <div className="-mr-1 md:hidden">
               <MobileNavigation />
             </div>
