@@ -5,7 +5,7 @@ import { addThumbnail } from '@/db/media'
 import { createTranscript } from '@/db/transcript'
 
 // Create a client to send and receive events
-export const inngest = new Inngest({ name: "InfluencerEdits" });
+export const inngest = new Inngest({ name: "AdEditor" });
 import { createClient } from '@supabase/supabase-js'
 
 // Use a custom domain as the supabase URL
@@ -20,7 +20,7 @@ const videoUpload = inngest.createFunction(
     let thumbnailUrl = (await requestThumbnail(event.data.video.url))[0].url
     let rows = await addThumbnail(supabase, event.data.video.id, thumbnailUrl)
     let transcribedWords = await requestTranscription({ "uploadUrl": event.data.video.url });
-    let transcript = await createTranscript(supabase, event.data.projectMediaId, transcribedWords.text, JSON.stringify(transcribedWords.words))
+    let transcript = await createTranscript(supabase, event.data.video.projectMediaId, transcribedWords.text, JSON.stringify(transcribedWords.words))
 
     return { event, body: { rows: rows, transcript: transcript } };
   }

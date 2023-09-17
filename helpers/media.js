@@ -1,9 +1,5 @@
-import { Inngest } from 'inngest';
-
-const inngest = new Inngest({ name: "InfluencerEdits", eventKey: "local" });
 
 export async function createMedia(supabase, video, projectId, userId) {
-
   const { error: mediaError } = await supabase
     .from('media')
     .insert([
@@ -34,15 +30,27 @@ export async function createMedia(supabase, video, projectId, userId) {
     throw new Error('Error inserting data:', projectMediaError.message);
   }
 
-  inngest.send({
-    name: "media/video.upload",
-    data: {
-      video: video,
-      projectMediaId: projectMediaData[0].id
+  video.projectMediaId = projectMediaData[0].id
+
+  const response = await fetch('/api/media', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
     },
+    body: JSON.stringify({
+      video: video,
+      project_id: projectId,
+    }),
   });
 
-  video.projectMediaId = projectMediaData[0].id
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('No API key was provided. Please refer to the README.md for instructions.');
+    } else {
+      throw new Error(`The request failed with status code ${response.status}`);
+    }
+  }
+
   return video
 }
 
@@ -72,8 +80,6 @@ export async function getProjectMedia(supabase, projectId) {
   const flatData = data.map((d) => {
     return { projectMediaId: d.id, words: d.transcript && d.transcript.length ? JSON.parse(d.transcript[0].words) : null, ...d.media }
   });
-
-  console.log(flatData)
 
   return flatData;
 }

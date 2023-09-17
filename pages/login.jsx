@@ -36,7 +36,6 @@ export default function Login() {
         for a free trial.
       </p>
       <Auth
-        redirectTo="https://www.adeditor.io/app/dashboard"
         appearance={{ theme: ThemeSupa }}
         supabaseClient={supabaseClient}
         providers={['google']}

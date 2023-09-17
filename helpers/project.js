@@ -1,7 +1,7 @@
 import { v4 as uuid } from "uuid";
 
 
-export async function createProject(supabase, name = "New Project", userId = "6a34be3e-6b08-4788-9be3-6c2c38025ea6") {
+export async function createProject(supabase, userId, name = "Untitled Project") {
   const { data, error } = await supabase
     .from('project')
     .insert([
@@ -17,6 +17,20 @@ export async function createProject(supabase, name = "New Project", userId = "6a
     console.error('Error inserting data:', error.message);
     return;
   }
+  console.log("no error")
+  return data
+}
+
+export async function updateProject(supabase, project) {
+  const { data, error } = await supabase
+    .from('project')
+    .update(project)
+    .eq('id', project.id)
+
+  if (error) {
+    console.error('Error inserting data:', error.message);
+    return;
+  }
 
   return data
 }
@@ -26,6 +40,21 @@ export async function getProjects(supabase, userId) {
     .from('project')
     .select()
     .eq('user_id', userId)
+
+  if (error) {
+    console.error('Error inserting data:', error.message);
+    return;
+  }
+
+  return data
+}
+
+export async function getProject(supabase, projectId) {
+  const { data, error } = await supabase
+    .from('project')
+    .select()
+    .single()
+    .eq('id', projectId)
 
   if (error) {
     console.error('Error inserting data:', error.message);

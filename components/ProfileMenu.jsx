@@ -1,22 +1,32 @@
-import { Fragment } from 'react'
+import { Fragment, useEffect } from 'react'
 import { Disclosure, Menu } from '@headlessui/react'
 import { Popover, Transition } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import {createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-  
-const user = {
-  name: 'Tom Cook',
-  email: 'tom@example.com',
-  imageUrl:
-    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-}
+import {useUser } from '@supabase/auth-helpers-react'
+import {useState} from 'react'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function ProfileMenu({}) {
+export default function ProfileMenu() {
   const supabase = createClientComponentClient()
+
+  const user = useUser()
+
+  const [userData, setUserData] = useState({name: '', email: '', imageUrl: ''})
+
+  if (user) {
+  supabase
+    .from("user")
+    .select()
+    .single()
+    .eq("id", user.id)
+    .then(({data}) => {
+      setUserData({name: data.name, email:data.email, imageUrl: data.image_url})
+    })
+  }
+
 
   const userNavigation = [
     // { name: 'Your Profile', href: '#' },
@@ -30,7 +40,7 @@ export default function ProfileMenu({}) {
                         <Menu.Button className="relative flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                           <span className="absolute -inset-1.5" />
                           <span className="sr-only">Open user menu</span>
-                          <img className="h-8 w-8 rounded-full" src={user.imageUrl} alt="" />
+                          <img className="h-8 w-8 rounded-full" src={userData.imageUrl} alt="" />
                         </Menu.Button>
                       </div>
                       <Transition

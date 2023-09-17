@@ -56,10 +56,6 @@ export default function UploadVideo({uploadStartedCallback, uploadFinishedCallba
     var upload = s3
       .putObject(params)
       .on("httpUploadProgress", (evt) => {
-        // File uploading progress
-        console.log(
-          "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
-        );
       })
       .promise();
     uploadStartedCallback(video);

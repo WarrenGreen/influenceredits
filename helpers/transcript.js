@@ -15,7 +15,5 @@ export async function getTranscript(supabase, projectMediaId) {
     throw new Error('Error fetching data:', error.message);
   }
 
-  console.log(data)
-
   return data;
 }

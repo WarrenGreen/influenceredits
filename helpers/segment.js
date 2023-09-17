@@ -41,7 +41,6 @@ export async function getProjectSegments(supabase, projectId) {
     )
     .eq('project_media.project_id', projectId)
     .order('index');
-  console.log(projectId)
   console.log(data)
 
   if (error) {

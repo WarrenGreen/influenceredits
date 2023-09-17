@@ -43,6 +43,7 @@ const uploadFile = async () => {
   });
 
   let videoId = uuid();
+  const fileName = file.name.split(".")[0].clone()
   let splits = file.name.split(".")
   let videoExtension = splits[splits.length-1];
   let storageName = videoId + "." + videoExtension;
@@ -57,7 +58,7 @@ const uploadFile = async () => {
   let video = {
     "id": videoId,
     "url": "https://influencer-edits.s3.amazonaws.com/videos/" + storageName,
-    "name": file.name,
+    "name": fileName,
     "status": "uploading",
     "thumbnail": "",
     "loading": true,
@@ -70,16 +71,14 @@ const uploadFile = async () => {
     .putObject(params)
     .on("httpUploadProgress", (evt) => {
       // File uploading progress
-      console.log(
-        "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
-      );
       setUploadProgress(parseInt((evt.loaded * 100) / evt.total));
     })
     .promise();
   //uploadStartedCallback(video);
 
   await upload.then((err, data) => {
-    createProject(supabase).then((newProject) => {
+    createProject(supabase, user.id).then((newProject) => {
+      
       createMedia(supabase, video,  newProject.id, user.id).then((media) => {
         setRouterLoading(true)
         let url = "/app/selection/"+newProject.id

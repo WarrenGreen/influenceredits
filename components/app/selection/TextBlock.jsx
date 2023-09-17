@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback} from "react";
 import { debounce } from "@/helpers/utils";
 import Word from "./Word";
 import {v4 as uuid} from "uuid";

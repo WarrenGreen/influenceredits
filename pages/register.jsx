@@ -1,7 +1,5 @@
 import Link from 'next/link'
 
-import { Button } from '@/components/Button'
-import { SelectField, TextField } from '@/components/Fields'
 import { Logo } from '@/components/Logo'
 import { SlimLayout } from '@/components/SlimLayout'
 import { Auth } from '@supabase/auth-ui-react'
@@ -33,11 +31,11 @@ export default function Register() {
           className="font-medium text-purple-600 hover:underline"
         >
           Sign in
-        </Link>{' '}
+        </Link>
         to your account.
       </p>
       <Auth
-        redirectTo="https://www.adeditor.io/app/dashboard"
+        redirectTo="https://adeditor.io/api/auth/callback"
         appearance={{ theme: ThemeSupa }}
         supabaseClient={supabaseClient}
         providers={['google']}

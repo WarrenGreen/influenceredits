@@ -22,17 +22,17 @@ export const getServerSideProps = async (context) => {
     data: { session },
   } = await supabase.auth.getSession()
 
-  if (!session)
+  const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+  if (!session || !user )
     return {
       redirect: {
         destination: '/',
         permanent: false,
       },
     }
-
-  const {
-      data: { user },
-    } = await supabase.auth.getUser()
   let projects = await getProjects(supabase, user.id)
   projects = await Promise.all(projects.map(async (project) => {
     const projectMedia = await getProjectMedia(supabase, project.id);
@@ -60,9 +60,8 @@ export default function Dashboard({projects}) {
     :
     <>
       <AppHeader >
-        <ProjectList projects={projects} />
+        <ProjectList createNewProject={()=>{setShowModal(true)}} projects={projects} />
       </AppHeader>
-      <Button onClick={()=>{setShowModal(true)}}>New Project</Button>
       {showModal? <UploadModal setRouterLoading={setRouterLoading} setShowModal={setShowModal}/>:<></>}
     </>
     }

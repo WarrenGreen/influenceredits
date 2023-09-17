@@ -1,28 +1,23 @@
-import { useEffect, useRef, useState } from 'react'
 import Layout from '@/components/Layout'
 import TextBlock from '@/components/app/selection/TextBlock'
 import VideoBlock from '@/components/app/selection/VideoBlock'
 import Timeline from '@/components/app/timeline/Timeline'
+import { useEffect, useRef, useState } from 'react'
 
 import { createMedia, getProjectMedia } from '@/helpers/media'
-import {getSegments, getProjectSegments} from '@/helpers/segment'
-import {getInitialSource} from '@/helpers/project'
-import {getTranscript} from '@/helpers/transcript'
+import { getInitialSource, getProject, updateProject } from '@/helpers/project'
+import { getProjectSegments } from '@/helpers/segment'
 import { getThumbnail } from '@/helpers/thumbnail'
-import {useInterval} from '@/helpers/useInterval'
+import { useInterval } from '@/helpers/useInterval'
 
-import ProcessStatus from '@/components/app/process_status/ProcessStatus'
-import { Flex } from '@radix-ui/themes'
-import { Oval } from 'react-loader-spinner'
-import { v4 as uuid } from 'uuid'
-import UploadVideo from '@/components/app/Upload'
-import SelectionPreview from '@/components/app/selection/SelectionPreview'
 import Loader from '@/components/Loader'
+import ProcessStatus from '@/components/app/process_status/ProcessStatus'
+import SelectionPreview from '@/components/app/selection/SelectionPreview'
+import { v4 as uuid } from 'uuid'
+import { PencilSquareIcon, XCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
+import { createClientComponentClient, createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 
-import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-
-import React from "react" 
+import React from "react"
 React.useLayoutEffect = React.useEffect 
 
 export const getServerSideProps = async (context) => {
@@ -48,6 +43,7 @@ export const getServerSideProps = async (context) => {
     props: {
       projectVideos: await getProjectMedia(supabase, projectId),
       projectSegments: await getProjectSegments(supabase, projectId),
+      project: await getProject(supabase, projectId),
       projectId,
       initialSession: session,
       user: session.user,
@@ -56,7 +52,7 @@ export const getServerSideProps = async (context) => {
   
 }
 
-export default function Editor({initialSession, user, projectVideos, projectSegments, projectId}) {
+export default function Editor({initialSession, user, projectVideos, projectSegments, project, projectId}) {
   const supabaseClient = createClientComponentClient()
   let playerRef = useRef();
 
@@ -64,7 +60,7 @@ export default function Editor({initialSession, user, projectVideos, projectSegm
   const [segments, setSegments] = useState(projectSegments);
   const initialSource = getInitialSource(projectVideos, projectSegments);
   const [source, setSource] = useState(initialSource);
-
+  const [projectName, setProjectName] = useState(project.name);
   useEffect(() => {
     if (videos[0] == undefined) {
       return 
@@ -143,22 +139,6 @@ export default function Editor({initialSession, user, projectVideos, projectSegm
         return {...newVideo, status:"transcribing"};
     }));
     playerRef.current.src=video.url;
-    //setSource({
-    //  "output_format": "mp4",
-    //  "width": 2400,
-    //  "height": 1350,
-    //  "duration": "47 s",
-    //  "elements": [
-    //    {
-    //      "id": video.id,
-    //      "type": "video",
-    //      "track": 1,
-    //      "trim_start": 0,
-    //      "trim_duration":47,
-    //      "source": video.url
-    //    },
-    //  ]
-    //})
 
     })
   }
@@ -167,7 +147,7 @@ export default function Editor({initialSession, user, projectVideos, projectSegm
     setVideos(videos => [...videos, video]);
   }
 
-
+  const [editingProjectName, setEditingProjectName] = useState(false)
 
   return (
     <>
@@ -176,6 +156,25 @@ export default function Editor({initialSession, user, projectVideos, projectSegm
       <ProcessStatus state="select" projectId={projectId} style={{top:"0", height: "3.5rem"}} />
     <div className='flex' style={{flex: 1}} width="100%">
       <div className="sidebar"> 
+        <div className='m-2 font-bold flex items-center justify-between'>
+          { !editingProjectName ?
+            <>{projectName}<PencilSquareIcon onClick={() => setEditingProjectName(true)} className='w-4 h-4' /></>
+            :
+            <>
+              <input type="text"
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                placeholder={projectName}
+                value={projectName}
+                onChange={(e)=>{setProjectName(e.target.value)}}
+              />
+              <div className='flex ml-2'>
+                <XCircleIcon onClick={() => {setProjectName(project.name); setEditingProjectName(false);}} className='w-6 h-6 ' />
+                <CheckCircleIcon onClick={() => {project.name=projectName; updateProject(supabaseClient, project); setEditingProjectName(false)}} className='w-6 h-6 ' />
+              </div>
+            </>
+          }
+          
+        </div>
         {videos.length ? <video controls ref={playerRef} src={videos.length? videos[0].url: null} width="100%"></video> :<div style={{height:"250px", width: "100%", backgroundColor:"gray"}}></div>}
         <div className="video-set">
           {videos.map((video) => {

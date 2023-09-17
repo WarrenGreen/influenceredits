@@ -12,7 +12,6 @@ import {useSession} from '@supabase/auth-helpers-react';
 
 export default function Home() {
   const user = useSession();
-  console.log(user)
 
   return (
     <>
