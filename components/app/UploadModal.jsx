@@ -12,7 +12,7 @@ export const getServerSideProps = async ({ params }) => {
   return { props: { host: process.env.NEXT_PUBLIC_HOST } }
 }
 
-export default function UploadModal ({setShowModal, setRouterLoading}) {
+export default function UploadModal ({setShowModal}) {
   const router = useRouter()
   const supabase = createClientComponentClient()
   const user = useUser()
@@ -43,7 +43,7 @@ const uploadFile = async () => {
   });
 
   let videoId = uuid();
-  const fileName = file.name.split(".")[0].clone()
+  const fileName = (' ' + file.name.split(".")[0]).slice(1);
   let splits = file.name.split(".")
   let videoExtension = splits[splits.length-1];
   let storageName = videoId + "." + videoExtension;
@@ -80,7 +80,6 @@ const uploadFile = async () => {
     createProject(supabase, user.id).then((newProject) => {
       
       createMedia(supabase, video,  newProject.id, user.id).then((media) => {
-        setRouterLoading(true)
         let url = "/app/selection/"+newProject.id
         router.push(url)
       })      

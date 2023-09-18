@@ -50,21 +50,13 @@ export const getServerSideProps = async (context) => {
 export default function Dashboard({projects}) {
 
   const [showModal, setShowModal] = useState(false);
-  const [routerLoading, setRouterLoading] = useState(false)
-
   
   return (
-    <>
-    {routerLoading ? 
-    <LoaderPage/>
-    :
     <>
       <AppHeader >
         <ProjectList createNewProject={()=>{setShowModal(true)}} projects={projects} />
       </AppHeader>
-      {showModal? <UploadModal setRouterLoading={setRouterLoading} setShowModal={setShowModal}/>:<></>}
-    </>
-    }
+      {showModal? <UploadModal setShowModal={setShowModal}/>:<></>}
     </>
   )
 }

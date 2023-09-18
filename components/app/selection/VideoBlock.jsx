@@ -22,7 +22,6 @@ export default function VideoBlock({ video, selected }) {
     
     />
 
-      
       }
       <div style={{"margin": "10px", overflow: "hidden"}}>
         <div style={{"fontWeight": "bold", whiteSpace: "nowrap"}}>{video.name}</div>

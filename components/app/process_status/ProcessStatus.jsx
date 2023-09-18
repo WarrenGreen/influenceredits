@@ -4,10 +4,13 @@ import Link from 'next/link'
 export default function ProcessStatus({state, projectId}) {
 
   let processStatus = {}
+  let nextUrl = "#";
   if (state == "select") {
     processStatus = {"selection": 'current', 'overlay':'upcoming', 'render': 'upcoming'}
+    nextUrl = "/app/overlay/"+projectId
   } else if (state == "overlay") {
     processStatus = {"selection": 'complete', 'overlay':'current', 'render': 'upcoming'}
+    nextUrl = "/app/render/"+projectId
   }else {
     processStatus = {"selection": 'complete', 'overlay':'complete', 'render': 'current'}
   }
@@ -20,21 +23,19 @@ export default function ProcessStatus({state, projectId}) {
   return (
     <nav aria-label="Progress">
       <ol role="list" className="divide-y divide-gray-300 rounded-md border border-gray-300 md:flex md:divide-y-0">
-      
-
-            <li className="relative flex md:flex-1 mx-5 w-10 justify-center items-center" style={{flex: 0}}>
-            <Link href="/app/dashboard" className="w-10" aria-label="Dashboard">
-            <img
-                        className="block h-8 lg:hidden"
-                        src="/logo-sans-text.svg"
-                        alt="AdEditor"
-                      />
-                      <img
-                        className="hidden h-8 lg:block"
-                        src="/logo-sans-text.svg"
-                        alt="AdEditor"
-                      />
-            </Link>
+        <li className="relative flex md:flex-1 mx-5 w-10 justify-center items-center" style={{flex: 0}}>
+          <Link href="/app/dashboard" onClick={() => {return true}} className="w-10" aria-label="Dashboard">
+          <img
+            className="block h-8 lg:hidden"
+            src="/logo-sans-text.svg"
+            alt="AdEditor"
+          />
+          <img
+            className="hidden h-8 lg:block"
+            src="/logo-sans-text.svg"
+            alt="AdEditor"
+          />
+          </Link>
         </li>
         {steps.map((step, stepIdx) => (
           <li key={step.name} className="relative md:flex md:flex-1">
@@ -89,9 +90,9 @@ export default function ProcessStatus({state, projectId}) {
         ))}
 
         <li className="bg-violet-800 relative flex md:flex-1 w-24 justify-center items-center" style={{flex: 0}}>
-              <a href={'#'} className="text-sm text-white px-10 font-bold">
+              <Link href={nextUrl} className="text-sm text-white px-10 font-bold">
                   Next
-              </a>
+              </Link>
         </li>
       </ol>
     </nav>

@@ -8,6 +8,7 @@ export async function getThumbnail(supabase, videoId) {
     .select(
       `thumbnail`
     )
+    .single()
     .eq('id', videoId);
 
   if (error) {
@@ -15,5 +16,5 @@ export async function getThumbnail(supabase, videoId) {
     throw new Error('Error fetching data:', error.message);
   }
 
-  return data;
+  return data ? data.thumbnail : data;
 }

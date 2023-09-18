@@ -5,7 +5,9 @@ import { Inter, Lexend } from 'next/font/google'
 
 import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
+import LoaderPage from '@/components/LoaderPage'
 
 
 export const inter = Inter({
@@ -23,6 +25,27 @@ export const lexend = Lexend({
 
 function MyApp({ Component, pageProps }) {
   const [supabaseClient] = useState(() => createPagesBrowserClient())
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const handleRouteChange = (url) => {
+      setLoading(true)
+    }
+
+    const handleRouteChangeComplete = () => {
+      setLoading(false)
+    }
+
+    router.events.on('routeChangeStart', handleRouteChange)
+    router.events.on('routeChangeComplete', handleRouteChangeComplete)
+
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChange)
+      router.events.off('routeChangeComplete', handleRouteChangeComplete)
+    }
+  }, [router.events])
+
   return (
     <SessionContextProvider
       supabaseClient={supabaseClient}
@@ -38,7 +61,7 @@ function MyApp({ Component, pageProps }) {
             height: 100%;
           }
         `}</style>
-        <Component {...pageProps} />
+        {loading? <LoaderPage /> : <Component {...pageProps} />}
       </main>
       </SessionContextProvider>
   )
