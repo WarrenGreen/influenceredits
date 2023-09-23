@@ -42,7 +42,7 @@ export default function ProcessStatus({state, projectId}) {
             {step.status === 'complete' ? (
               <a href={step.href} className="group flex w-full items-center">
                 <span className="flex items-center px-6 py-1 text-sm font-medium">
-                  <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-600 group-hover:bg-indigo-800">
+                  <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-purple-600 group-hover:bg-purple-800">
                     <CheckIcon className="h-6 w-6 text-white" aria-hidden="true" />
                   </span>
                   <span className="ml-4 text-sm font-medium text-gray-900">{step.name}</span>
@@ -50,10 +50,10 @@ export default function ProcessStatus({state, projectId}) {
               </a>
             ) : step.status === 'current' ? (
               <a href={step.href} className="flex items-center px-6 py-1 text-sm font-medium" aria-current="step">
-                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-indigo-600">
-                  <span className="text-indigo-600">{step.id}</span>
+                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-purple-600">
+                  <span className="text-purple-600">{step.id}</span>
                 </span>
-                <span className="ml-4 text-sm font-medium text-indigo-600">{step.name}</span>
+                <span className="ml-4 text-sm font-medium text-purple-600">{step.name}</span>
               </a>
             ) : (
               <a href={step.href} className="group flex items-center">
@@ -89,7 +89,7 @@ export default function ProcessStatus({state, projectId}) {
           </li>
         ))}
 
-        <li className="bg-violet-800 relative flex md:flex-1 w-24 justify-center items-center" style={{flex: 0}}>
+        <li className="bg-purple-800 relative flex md:flex-1 w-24 justify-center items-center" style={{flex: 0}}>
               <Link href={nextUrl} className="text-sm text-white px-10 font-bold">
                   Next
               </Link>

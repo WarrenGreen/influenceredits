@@ -106,7 +106,7 @@ export default function Editor({initialSession, user, projectVideos, projectSegm
     videos.map(async (video) =>{ 
       if (video.thumbnail == null || video.thumbnail == "") {
         let thumbnailUrl = await getThumbnail(supabaseClient, video.id)
-          if (thumbnailUrl && thumbnailUrl != ""){
+          if (thumbnailUrl){
             setVideos(videos => videos.map((currentVideo) => {
               if (currentVideo.id == video.id) {
                 return {...video, thumbnail:thumbnailUrl};

@@ -1,102 +1,143 @@
-import { useEffect, useRef, useState } from 'react'
 import Layout from '@/components/Layout'
-import TextBlock from '@/components/app/selection/TextBlock'
-import VideoBlock from '@/components/app/selection/VideoBlock'
-import Timeline from '@/components/app/timeline/Timeline'
-import { defaultVideos, defaultWords } from '@/helpers/utils'
+import { useState } from 'react'
 
-import { createMedia, getProjectMedia } from '@/helpers/media'
-import {getSegments, getProjectSegments} from '@/helpers/segment'
-import {getInitialSource} from '@/helpers/project'
-import {getTranscript} from '@/helpers/transcript'
-import { getThumbnail } from '@/helpers/thumbnail'
-import {useInterval} from '@/helpers/useInterval'
+import { getProjectMedia } from '@/helpers/media'
+import { getInitialSource, getProject, updateProject } from '@/helpers/project'
+import { getProjectSegments } from '@/helpers/segment'
 
-import OverlayPreview from '@/components/app/overlay/OverlayPreview'
-import RenderModal from '@/components/app/RenderModal'
 import OverlayCreator from '@/components/app/overlay/OverlayCreator'
 import ProcessStatus from '@/components/app/process_status/ProcessStatus'
-import { Flex } from '@radix-ui/themes'
-import { Oval } from 'react-loader-spinner'
-import { v4 as uuid } from 'uuid'
-import UploadVideo from '@/components/app/Upload'
-import { useRouter } from 'next/router'
-import { videoCreator } from '@/stores/VideoCreatorStore';
+import { videoCreator } from '@/stores/VideoCreatorStore'
+import { createClientComponentClient, createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 
+import Tooltip from '@/components/Tooltip'
 
-import React from "react" 
+import { Fragment } from 'react'
+import { Dialog, Transition } from '@headlessui/react'
+import ResizeIcon from '@/components/Icons/ResizeIcon'
+import {
+  Bars3Icon,
+  CalendarIcon,
+  ChartPieIcon,
+  DocumentDuplicateIcon,
+  FolderIcon,
+  HomeIcon,
+  UsersIcon,
+  MapIcon,
+  XMarkIcon,
+  ChatBubbleLeftEllipsisIcon
+} from '@heroicons/react/24/outline'
+
+import React from "react"
+import Image from 'next/image'
+import TemplateGrid from '../../../components/app/overlay/TemplateGrid'
+import ResizeGrid from '../../../components/app/overlay/ResizeGrid'
+import ComboBox from '../../../components/ComboBox'
 React.useLayoutEffect = React.useEffect 
 
 
-export const getServerSideProps = async ({ params }) => {
-  if (typeof params.projectId != "string" || params.projectId == "[object Object]") return {props: {projectVideos: []}}
-  const projectId = params.projectId
-  let projectVideos = await getProjectMedia(projectId)
-  let projectSegments = await getProjectSegments(projectId);
+export const getServerSideProps = async (context) => {
+
+  // Create authenticated Supabase Client
+  const supabase = createPagesServerClient(context)
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session)
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
+  if (typeof context.params.projectId != "string" || context.params.projectId == "[object Object]") return {props: {projectVideos: []}}
+  const projectId = context.params.projectId
 
   return {
-    props: {projectVideos, projectSegments, projectId},
+    props: {
+      projectVideos: await getProjectMedia(supabase, projectId),
+      projectSegments: await getProjectSegments(supabase, projectId),
+      project: await getProject(supabase, projectId),
+      projectId,
+      initialSession: session,
+      user: session.user,
+    },
   }
   
 }
 
-export default function Editor({projectVideos, projectSegments, projectId}) {
 
-  const initialSource = getInitialSource(projectVideos, projectSegments);
-  initialSource.elements.push({
-    id: '72ec46a3-610c-4b46-86ef-c9bbc337f012',
-    name: 'Tagline',
-    type: 'text',
-    track: 2,
-    time: 1,
-    duration: 2.5,
-    dynamic: true,
-    y: '73.7108%',
-          width: '69.7955%',
-          height: '12.5699%',
-    x_alignment: '50%',
-    fill_color: '#ffffff',
-    animations: [
-      {
-        time: 'start',
-        duration: 1,
-        easing: 'quadratic-out',
-        type: 'text-slide',
-        scope: 'split-clip',
-        split: 'word',
-        direction: 'up',
-      },
-    ],
-    text: 'Enter your tagline here',
-    font_family: 'Oswald',
-    font_weight: '600',
-    text_transform: 'uppercase',
-  })
+function classNames(...classes) {
+  return classes.filter(Boolean).join(' ')
+}
 
-  videoCreator.source = initialSource;
+export default function Overlay({projectId}) {
 
-  const [source, setSource] = useState(initialSource);
-  const [segments, setSegments] = useState(projectSegments);
-  let [selectedVideo, setSelectedVideo] = useState(projectVideos.length ==0? null: projectVideos[0].id);
+  const [sidebarState, setSidebarState] = useState("Templates")
+  const [resolution, setResolution] = useState([2540, 1414]);
 
-
-
-  let currentVideo_beta = null;
-  for (let index in projectVideos) {
-    if (selectedVideo == projectVideos[index].id) {
-      currentVideo_beta = projectVideos[index]
-    }
-  }
-  const [currentVideo, setCurrentVideo] = useState(currentVideo_beta)
-
+  const navigation = [
+    { name: 'Templates', onClick:()=>setSidebarState("Templates"), icon: MapIcon },
+    { name: 'Subtitles', onClick:()=>setSidebarState("Subtitles"), icon: ChatBubbleLeftEllipsisIcon },
+    { name: 'Resize', onClick:()=>setSidebarState("Resize"), icon: ResizeIcon },
+  ]
 
   return (
-    <>
-    <Layout>
-      <ProcessStatus state="overlay" projectId={projectId} style={{top:"0", height: "3.5rem"}} />
-      <OverlayCreator />
+    <div className='flex flex-col h-full'>
+      {/*
+        This example requires updating your template:
 
-    </Layout>
-    </>
+        ```
+        <html class="h-full bg-white">
+        <body class="h-full">
+        ```
+      */}
+      <ProcessStatus state="overlay" projectId={projectId}  />
+      <div className="flex overflow-hidden" style={{flex: 1}}>
+        {/* Static sidebar for desktop */}
+        <div className="hiddenlg:z-50 lg:block lg:w-20 lg:bg-purple-900 lg:pb-4 overflow-x-visible">
+          <nav className="mt-8">
+            <ul role="list" className="flex flex-col items-center space-y-1">
+              {navigation.map((item) => (
+                <Tooltip text={item.name}>
+                <li key={item.name} onClick={item.onClick}>
+                  <a
+                    className={classNames(
+                      sidebarState == item.name ? 'bg-purple-800 text-white' : 'text-purple-400 hover:text-white hover:bg-purple-800',
+                      'group flex gap-x-3 rounded-md p-3 text-sm leading-6 font-semibold'
+                    )}
+                  >
+                    <item.icon alt={item.name} color="currentColor" className="h-6 w-6 shrink-0" aria-hidden="true" />
+                    <span className="sr-only">{item.name}</span>
+                  </a>
+                </li>
+                </Tooltip>
+              ))}
+            </ul>
+          </nav>
+        </div>
+
+        <main className="p-5 overflow-y-scroll" style={{flex: 1}}>
+            { sidebarState == "Templates" ? 
+                <TemplateGrid resolution={resolution} />
+              :
+              sidebarState == "Resize" ?
+                <div className='flex flex-col gap-y-4' >
+                  <ComboBox />
+                  <hr />
+                  <ResizeGrid originalResolution={[2540, 1414]} setResolution={setResolution} />
+                </div>
+              :
+              <></>
+            }
+        </main>
+
+        <div style={{flex:2}}className="bg-slate-200 overflow-y-auto border-r border-gray-200 px-4 py-6 sm:px-6 lg:px-8 xl:block">
+          {/* Main area */}
+        </div>
+      </div>
+    </div>
   )
 }

@@ -5,6 +5,7 @@ export async function addThumbnail(supabase, id, thumbnailUrl) {
     .update({ thumbnail: thumbnailUrl })
     .eq("id", id)
     .select()
+    .single()
 
   if (error) {
     console.log(error)
