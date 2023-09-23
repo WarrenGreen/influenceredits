@@ -27,10 +27,14 @@ const videoUpload = inngest.createFunction(
 
 
     ffmpeg.ffprobe(event.data.video.url, function (err, metadata) {
-      logger.info(metadata.format.duration);
-      video.width = metadata.streams[0].width;
-      video.height = metadata.streams[0].height;
-      updateMedia(supabase, video)
+      if (err) {
+        logger.error(err)
+      } else {
+        logger.info(metadata.format.duration);
+        video.width = metadata.streams[0].width;
+        video.height = metadata.streams[0].height;
+        updateMedia(supabase, video)
+      }
     });
     let transcribedWords = await requestTranscription({ "uploadUrl": event.data.video.url });
     let transcript = await createTranscript(supabase, event.data.video.projectMediaId, transcribedWords.text, JSON.stringify(transcribedWords.words))
