@@ -28,9 +28,9 @@ const videoUpload = inngest.createFunction(
 
     ffmpeg.ffprobe(event.data.video.url, function (err, metadata) {
       if (err) {
-        logger.error(err)
+        console.error(err)
       } else {
-        logger.info(metadata.format.duration);
+        console.log(metadata.format.duration);
         video.width = metadata.streams[0].width;
         video.height = metadata.streams[0].height;
         updateMedia(supabase, video)
