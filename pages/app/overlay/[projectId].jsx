@@ -101,7 +101,7 @@ export default function Overlay({projectId}) {
           <nav className="mt-8">
             <ul role="list" className="flex flex-col items-center space-y-1">
               {navigation.map((item) => (
-                <Tooltip text={item.name}>
+                <Tooltip key={'tooltip' + item.name} text={item.name}>
                 <li key={item.name} onClick={item.onClick}>
                   <a
                     className={classNames(

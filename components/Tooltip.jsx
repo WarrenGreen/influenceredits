@@ -34,8 +34,8 @@
 
 export default function Tooltip({children, text}) {
   return (
-    <div class="group relative inline-block tooltip">{children}
-      <span class="hidden bg-purple-700 text-white p-5 rounded-lg text-center absolute z-10 -top-1 tooltiptext group-hover:block" style={{left: "110%"}}>{text}</span>
+    <div className="group relative inline-block tooltip">{children}
+      <span className="hidden bg-purple-700 text-white p-5 rounded-lg text-center absolute z-10 -top-1 tooltiptext group-hover:block" style={{left: "110%"}}>{text}</span>
     </div>
   )
 }
