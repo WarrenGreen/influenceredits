@@ -7,7 +7,7 @@ import { createTranscript } from '@/db/transcript'
 // Create a client to send and receive events
 export const inngest = new Inngest({ name: "AdEditor" });
 import { createClient } from '@supabase/supabase-js'
-import { setResolution } from "../../helpers/media";
+import { updateMedia } from "../../helpers/media";
 
 const ffmpegStatic = require('ffmpeg-static');
 const ffmpeg = require('fluent-ffmpeg');
@@ -27,11 +27,10 @@ const videoUpload = inngest.createFunction(
 
 
     ffmpeg.ffprobe(event.data.video.url, function (err, metadata) {
-      //console.dir(metadata); // all metadata
       logger.info(metadata.format.duration);
-      setResolution(supabase, event.data.video.id, width = metadata.streams[0].width, height = metadata.streams[0].height)
       video.width = metadata.streams[0].width;
       video.height = metadata.streams[0].height;
+      updateMedia(supabase, video)
     });
     let transcribedWords = await requestTranscription({ "uploadUrl": event.data.video.url });
     let transcript = await createTranscript(supabase, event.data.video.projectMediaId, transcribedWords.text, JSON.stringify(transcribedWords.words))

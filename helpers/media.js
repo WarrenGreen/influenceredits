@@ -54,16 +54,11 @@ export async function createMedia(supabase, video, projectId, userId) {
   return video
 }
 
-export async function setResolution(supabase, mediaId, width, height) {
+export async function updateMedia(supabase, media) {
   const { error: mediaError } = await supabase
     .from('media')
-    .update([
-      {
-        width: width,
-        height: height,
-      },
-    ])
-  .eq('id', mediaId)
+    .update(media)
+    .eq('id', media.id)
   if (mediaError) {
     console.error(mediaError)
     throw new Error('Error inserting data:', mediaError.message);
