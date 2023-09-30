@@ -22,24 +22,39 @@ const videoUpload = inngest.createFunction(
   { event: "media/video.upload" },
   async ({ event, step }) => {
 
-    let thumbnailUrl = (await requestThumbnail(event.data.video.url))[0].url
-    let video = await addThumbnail(supabase, event.data.video.id, thumbnailUrl)
+    let videoWidth = null;
+    let videoHeight = null;
 
-
-    ffmpeg.ffprobe(event.data.video.url, function (err, metadata) {
+    ffmpeg.ffprobe(event.data.video.url, async function (err, metadata) {
       if (err) {
         console.error(err)
       } else {
         console.log(metadata.format.duration);
-        video.width = metadata.streams[0].width;
-        video.height = metadata.streams[0].height;
-        updateMedia(supabase, video)
+        console.log(metadata.streams[0].width)
+        metadata.streams.map((stream) => {
+          if (stream.width && stream.height) {
+            videoWidth = stream.width;
+            videoHeight = stream.height;
+          }
+        })
+
+        if (!videoWidth || !videoHeight)
+          throw Error("No dimensions found for video")
+
+        let thumbnailUrl = (await requestThumbnail(event.data.video.url, videoWidth, videoHeight))[0].url
+        let video = await addThumbnail(supabase, event.data.video.id, thumbnailUrl)
+        video.width = videoWidth;
+        video.height = videoHeight;
+        video = updateMedia(supabase, video)
+
+        let transcribedWords = await requestTranscription({ "uploadUrl": event.data.video.url });
+        let transcript = await createTranscript(supabase, event.data.video.projectMediaId, transcribedWords.text, JSON.stringify(transcribedWords.words))
+
+        return { event, body: { video: video, transcript: transcript } };
+
       }
     });
-    let transcribedWords = await requestTranscription({ "uploadUrl": event.data.video.url });
-    let transcript = await createTranscript(supabase, event.data.video.projectMediaId, transcribedWords.text, JSON.stringify(transcribedWords.words))
 
-    return { event, body: { video: video, transcript: transcript } };
   }
 );
 

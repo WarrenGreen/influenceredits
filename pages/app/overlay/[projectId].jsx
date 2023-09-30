@@ -1,10 +1,13 @@
 import Layout from '@/components/Layout'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import Loader from '@/components/Loader'
 
 import { getProjectMedia } from '@/helpers/media'
 import { getInitialSource, getProject, updateProject } from '@/helpers/project'
 import { getProjectSegments } from '@/helpers/segment'
 
+import { observer } from 'mobx-react-lite';
+import { overlayCreator } from '@/stores/OverlayCreatorStore';
 import OverlayCreator from '@/components/app/overlay/OverlayCreator'
 import ProcessStatus from '@/components/app/process_status/ProcessStatus'
 import { videoCreator } from '@/stores/VideoCreatorStore'
@@ -25,7 +28,9 @@ import {
   UsersIcon,
   MapIcon,
   XMarkIcon,
-  ChatBubbleLeftEllipsisIcon
+  ChatBubbleLeftEllipsisIcon,
+  ArrowUturnLeftIcon,
+  ArrowUturnRightIcon
 } from '@heroicons/react/24/outline'
 
 import React from "react"
@@ -33,6 +38,7 @@ import Image from 'next/image'
 import TemplateGrid from '../../../components/app/overlay/TemplateGrid'
 import ResizeGrid from '../../../components/app/overlay/ResizeGrid'
 import ComboBox from '../../../components/ComboBox'
+import MyPreview from '../../../components/app/preview_modal/MyPreview'
 React.useLayoutEffect = React.useEffect 
 
 
@@ -68,15 +74,51 @@ export const getServerSideProps = async (context) => {
   
 }
 
+function getWidth(fullSizeWidth, fullSizeHeight, height) {
+  return Math.round(height * fullSizeWidth / fullSizeHeight);
+}
+
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Overlay({projectId}) {
-
+const Overlay = observer(({projectId, projectVideos, projectSegments}) => {
   const [sidebarState, setSidebarState] = useState("Templates")
-  const [resolution, setResolution] = useState([2540, 1414]);
+  const [resolution, setResolution] = useState([projectVideos[0].width, projectVideos[0].height]);
+
+  const initialSource = {
+    "output_format": "mp4",
+    "width": getWidth(projectVideos[0].width, projectVideos[0].height, 300),
+    "height": 300,
+    "elements": projectSegments.map((segment) => {
+      
+      return {
+        "id": segment.id,
+        "type": "video",
+        "track": 1,
+        "width": getWidth(projectVideos[0].width, projectVideos[0].height, 300),
+        "height": 300,
+        "trim_start": segment.timeStart / 1000,
+        "trim_duration": (segment.timeEnd-segment.timeStart) / 1000,
+        "source": projectVideos[0].url
+      }
+    })
+  }
+  const [source, setSource] = useState(initialSource);
+
+  useEffect(() => {
+    setSource(oldSource => {
+      return {...oldSource, width: getWidth(resolution[0], resolution[1], 300), height: 300}
+    })
+  }, [resolution])
+
+  /*useEffect(() => {
+    if (overlayCreator.preview)
+      overlayCreator.preview?.setSource(source)
+  }, [source])
+*/
+
 
   const navigation = [
     { name: 'Templates', onClick:()=>setSidebarState("Templates"), icon: MapIcon },
@@ -96,7 +138,6 @@ export default function Overlay({projectId}) {
       */}
       <ProcessStatus state="overlay" projectId={projectId}  />
       <div className="flex overflow-hidden" style={{flex: 1}}>
-        {/* Static sidebar for desktop */}
         <div className="hiddenlg:z-50 lg:block lg:w-20 lg:bg-purple-900 lg:pb-4 overflow-x-visible">
           <nav className="mt-8">
             <ul role="list" className="flex flex-col items-center space-y-1">
@@ -119,25 +160,40 @@ export default function Overlay({projectId}) {
           </nav>
         </div>
 
-        <main className="p-5 overflow-y-scroll" style={{flex: 1}}>
+        <main className="p-5 overflow-y-scroll" style={{width: "500px"}}>
             { sidebarState == "Templates" ? 
-                <TemplateGrid resolution={resolution} />
+                <TemplateGrid thumbnail={projectVideos[0].thumbnail} resolution={resolution} />
               :
               sidebarState == "Resize" ?
                 <div className='flex flex-col gap-y-4' >
-                  <ComboBox />
+                  <ComboBox callback={(fillType) => {overlayCreator.setFillType(fillType)}}/>
                   <hr />
-                  <ResizeGrid originalResolution={[2540, 1414]} setResolution={setResolution} />
+                  <ResizeGrid originalResolution={[projectVideos[0].width, projectVideos[0].height]} setResolution={setResolution} />
                 </div>
               :
               <></>
             }
         </main>
 
-        <div style={{flex:2}}className="bg-slate-200 overflow-y-auto border-r border-gray-200 px-4 py-6 sm:px-6 lg:px-8 xl:block">
-          {/* Main area */}
+        <div style={{flex:2}} className="bg-slate-200 overflow-y-auto border-r border-gray-200 h-full flex flex-col">
+          <div className="h-10 w-full bg-white flex justify-center gap-6">
+            <ArrowUturnLeftIcon onClick={() => {overlayCreator.preview?.undo()}} className='w-6 cursor-pointer'/>
+            <ArrowUturnRightIcon  onClick={() => {overlayCreator.preview?.redo()}} className='w-6 cursor-pointer'/>
+            </div>
+            <div 
+              ref={(element) => {
+                if (element && element !== overlayCreator.preview?.element) {
+                  overlayCreator.initializeVideoPlayer(element, source);
+                }
+              }}
+              className="flex-1 m-5" 
+            ></div>
+            
+            {(overlayCreator.isLoading) && <div className="flex flex-col w-full h-full justify-center items-center"><Loader /><div>Your preview is loading...</div></div>}
         </div>
       </div>
     </div>
   )
-}
+})
+
+export default Overlay;

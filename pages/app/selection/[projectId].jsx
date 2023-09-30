@@ -175,7 +175,7 @@ export default function Editor({initialSession, user, projectVideos, projectSegm
           }
           
         </div>
-        {videos.length ? <video controls ref={playerRef} src={videos.length? videos[0].url: null} width="100%"></video> :<div style={{height:"250px", width: "100%", backgroundColor:"gray"}}></div>}
+        {videos.length ? <video controls className="max-h-52" ref={playerRef} src={videos.length? videos[0].url: null} width="100%"></video> :<div style={{height:"250px", width: "100%", backgroundColor:"gray"}}></div>}
         <div className="video-set">
           {videos.map((video) => {
               return <VideoBlock key={uuid()} video={video} selected={true} />

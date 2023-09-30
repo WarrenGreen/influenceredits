@@ -24,7 +24,6 @@ export const TimelineTrack = (props) => {
     ))
   }
   const [layout, setLayout] = useState(genLayout)
-  console.log(layout)
   const onLayoutChange = () => {
 
   }

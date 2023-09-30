@@ -4,15 +4,15 @@ import Loader from '@/components/Loader'
 
 
 
-export default function MyPreview ({source})  {
+export default function MyPreview ({source, className, interactive=false})  {
 
   // React Hook to update the component when the window width changes
 
   // Video aspect ratio that can be calculated once the video is loaded
   const [videoAspectRatio, setVideoAspectRatio] = useState();
-
   // Reference to the preview
   const previewRef = useRef();
+ 
 
   // Current state of the preview
   const [isReady, setIsReady] = useState(false);
@@ -27,7 +27,7 @@ export default function MyPreview ({source})  {
     }
 
     // Initialize a preview
-    const preview = new Preview(htmlElement, 'player', process.env.NEXT_PUBLIC_VIDEO_PLAYER_TOKEN);
+    const preview = new Preview(htmlElement, interactive? 'interactive': 'player', process.env.NEXT_PUBLIC_VIDEO_PLAYER_TOKEN);
 
     // Once the SDK is ready, load a template from our project
     preview.onReady = async () => {
@@ -62,7 +62,7 @@ export default function MyPreview ({source})  {
 
   return (
     <>
-      <div style={{flexGrow: 1, display: isLoading? "none": null}} ref={(htmlElement) => {
+      <div className={className} style={{flexGrow: 1, display: isLoading? "none": null}} ref={(htmlElement) => {
             if (htmlElement && htmlElement !== previewRef.current?.element) {
               setUpPreview(htmlElement);
             }

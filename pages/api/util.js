@@ -4,13 +4,13 @@ import axios from "axios";
 
 const client = new Client(process.env.CREATOMATE_API_KEY);
 
-export async function requestThumbnail(videoUrl) {
+export async function requestThumbnail(videoUrl, width, height) {
 
   let thumbnailSource = {
     "output_format": "jpg",
     "snapshot_time": 0,
-    "width": 150,
-    "height": 150,
+    "width": width,
+    "height": height,
     "elements": [
       {
         "type": "video",

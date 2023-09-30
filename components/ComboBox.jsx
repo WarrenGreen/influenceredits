@@ -1,21 +1,21 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 
 const people = [
-  { id: 1, name: 'Contain' },
-  { id: 2, name: 'Fill' },
+  { id: 1, name: 'Fill'},
+  { id: 2, name:  'Contain'},
 ]
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Example() {
+export default function ComboBox({callback}) {
   const [selected, setSelected] = useState(people[0])
 
   return (
-    <Listbox value={selected} onChange={setSelected}>
+    <Listbox value={selected} onChange={(e) => {setSelected(e); callback(e.name)}}>
       {({ open }) => (
         <>
           <Listbox.Label className="block text-sm font-medium leading-6 text-gray-900">Video Scaling</Listbox.Label>
