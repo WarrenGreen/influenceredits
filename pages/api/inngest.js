@@ -18,6 +18,10 @@ const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.
 
 import { Client, RenderOutputFormat } from 'creatomate';
 
+export const config = {
+  maxDuration: 300,
+};
+
 
 const client = new Client(process.env.CREATOMATE_API_KEY);
 

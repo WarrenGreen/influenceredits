@@ -12,7 +12,7 @@ const screenshotSelection = '/images/screenshots/selection.png'
 const screenshotScript = '/images/screenshots/script-editing.png'
 const screenshotPayroll = 'images/screenshots/payroll.png'
 const screenshotReporting = '/images/screenshots/reporting.png'
-const screenshotVatReturns = '/images/screenshots/vat-returns.png'
+const screenshotScaling = '/images/screenshots/scaling.png'
 
 const features = [
   {
@@ -28,16 +28,10 @@ const features = [
     image: screenshotScript,
   },
   {
-    title: 'VAT handling',
+    title: 'Export to any platform',
     description:
-      "We only sell our software to companies who don't deal with VAT at all, so technically we do all the VAT stuff they need.",
-    image: screenshotVatReturns,
-  },
-  {
-    title: 'Reporting',
-    description:
-      'Easily export your data into an Excel spreadsheet where you can do whatever the hell you want with it.',
-    image: screenshotReporting,
+      "Quickly select any ad platform and resize your content to fit.",
+    image: screenshotScaling,
   },
 ]
 

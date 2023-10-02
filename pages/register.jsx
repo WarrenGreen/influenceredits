@@ -40,6 +40,7 @@ export default function Register() {
         supabaseClient={supabaseClient}
         providers={['google']}
         socialLayout="horizontal"
+        onlyThirdPartyProviders={true}
       />
     </SlimLayout>
   )
