@@ -89,7 +89,7 @@ export default function ProcessStatus({state, projectId}) {
           </li>
         ))}
 
-        <li className="bg-purple-800 relative flex md:flex-1 w-24 justify-center items-center" style={{flex: 0}}>
+        <li className="bg-purple-800 relative flex md:flex-1 w-24 justify-center items-center" style={{flex: 0, display: state=='render' ? 'none': ''}}>
               <Link href={nextUrl} className="text-sm text-white px-10 font-bold">
                   Next
               </Link>

@@ -77,7 +77,7 @@ export default function Timeline({video, segments, setSegments }) {
 
     return (
       <>
-            <div className={styles.trackbar}>
+            <div className={styles.trackbar} style={{left:0, bottom:0, right:0, position: "absolute"}}>
             <SortableList className={styles.sortable} onSortEnd={onSortEnd}>
               { 
                 segments.map((segment, i) =>  (
@@ -92,10 +92,16 @@ export default function Timeline({video, segments, setSegments }) {
               }
               </SortableList>
               </div>
-              <div ref={ref}  style={{ minWidth:"175px", flexDirection:"column", alignItems:"start", display:visible, position: "fixed", top: y-20-30, left: x, borderRadius:"5px", overflow:"hidden"}} onClick={() =>{setVisible("none")}}>
-              {currentSegment!=null ? <EditSegmentModal supabase={supabase} setSegments={setSegments} style={{ width:"100%", borderRadius: "0px"}} segment={currentSegment} video={video}/>: <Button disabled style={{width:"100%", borderRadius: "0px"}}>Edit Segment</Button>}
-      <Button style={{width:"100%", borderRadius: "0px"}}onClick={() =>{deleteSegment();setVisible("none")}}>Delete <TrashIcon/></Button>
-    </div>
+              <div ref={ref}  className="bg-purple-500" style={{ minWidth:"175px", flexDirection:"column", alignItems:"start", display:visible, position: "fixed", top: y-20-30, left: x, borderRadius:"5px", overflow:"hidden"}} onClick={() =>{setVisible("none")}}>
+              {
+                currentSegment!=null ? 
+                  <EditSegmentModal supabase={supabase} setSegments={setSegments} style={{ width:"100%", borderRadius: "0px"}} segment={currentSegment} video={video}/>
+                  : 
+                  <Button disabled style={{width:"100%", borderRadius: "0px"}}>Edit Segment</Button>
+              }
+              <div style={{height:"1px"}} className='w-full bg-purple-300' />
+              <Button style={{width:"100%", borderRadius: "0px"}}onClick={() =>{deleteSegment();setVisible("none")}}>Delete <TrashIcon/></Button>
+            </div>
       </>
     )
 }

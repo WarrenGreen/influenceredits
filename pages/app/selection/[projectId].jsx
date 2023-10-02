@@ -59,6 +59,8 @@ export default function Editor({initialSession, user, projectVideos, projectSegm
   let [videos, setVideos] = useState(projectVideos);
   const [segments, setSegments] = useState(projectSegments);
   const initialSource = getInitialSource(projectVideos, projectSegments);
+  console.log("source")
+  console.log(initialSource)
   const [source, setSource] = useState(initialSource);
   const [projectName, setProjectName] = useState(project.name);
   useEffect(() => {
@@ -152,59 +154,57 @@ export default function Editor({initialSession, user, projectVideos, projectSegm
   return (
     <>
     <Layout>
-      <div className='flex flex-col' style={{height: "100%"}}>
-      <ProcessStatus state="select" projectId={projectId} style={{top:"0", height: "3.5rem"}} />
-    <div className='flex' style={{flex: 1}} width="100%">
-      <div className="sidebar"> 
-        <div className='m-2 font-bold flex items-center justify-between'>
-          { !editingProjectName ?
-            <>{projectName}<PencilSquareIcon onClick={() => setEditingProjectName(true)} className='w-4 h-4' /></>
-            :
-            <>
-              <input type="text"
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                placeholder={projectName}
-                value={projectName}
-                onChange={(e)=>{setProjectName(e.target.value)}}
-              />
-              <div className='flex ml-2'>
-                <XCircleIcon onClick={() => {setProjectName(project.name); setEditingProjectName(false);}} className='w-6 h-6 ' />
-                <CheckCircleIcon onClick={() => {project.name=projectName; updateProject(supabaseClient, project); setEditingProjectName(false)}} className='w-6 h-6 ' />
-              </div>
-            </>
-          }
-          
-        </div>
-        {videos.length ? <video controls className="max-h-52" ref={playerRef} src={videos.length? videos[0].url: null} width="100%"></video> :<div style={{height:"250px", width: "100%", backgroundColor:"gray"}}></div>}
-        <div className="video-set">
-          {videos.map((video) => {
-              return <VideoBlock key={uuid()} video={video} selected={true} />
-          })}
-        </div>
-		  </div>
+        <ProcessStatus state="select" projectId={projectId} style={{top:"0", position:"absolute", height: "3.5rem"}} />
+      <div className='flex' style={{position: "absolute", top: "3rem", left: 0, right: 0, bottom:"3.5rem"}} width="100%">
+        <div className="sidebar"> 
+          <div className='m-2 font-bold flex items-center justify-between'>
+            { !editingProjectName ?
+              <>{projectName}<PencilSquareIcon onClick={() => setEditingProjectName(true)} className='w-4 h-4' /></>
+              :
+              <>
+                <input type="text"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  placeholder={projectName}
+                  value={projectName}
+                  onChange={(e)=>{setProjectName(e.target.value)}}
+                />
+                <div className='flex ml-2'>
+                  <XCircleIcon onClick={() => {setProjectName(project.name); setEditingProjectName(false);}} className='w-6 h-6 ' />
+                  <CheckCircleIcon onClick={() => {project.name=projectName; updateProject(supabaseClient, project); setEditingProjectName(false)}} className='w-6 h-6 ' />
+                </div>
+              </>
+            }
 
-      
-      {
-      videos.length ==0 ? 
-        <></>
-      : 
-        (!videos[0].words ? 
-          <div className="flex flex-col items-center justify-center" style={{flex: 4}}>
-            <Loader />
-            <div className="text-6xl p-10">Transcribing.</div>
-            <div className="text-s text-slate-600">This could take a few moments so grab a coffee or switch tabs. We&apos;ll be here.</div>
           </div>
-        :
-        <div style={{flex: 4, display:"flex", overflow: "hidden"}}>
-          <TextBlock supabaseClient={supabaseClient} video={videos[0]} seekVideo={seekVideo} segments={segments} setSegments={setSegments} projectMediaId={videos[0].projectMediaId} />
-          <SelectionPreview source={source} video={videos[0]} segments={segments} setSegments={setSegments} projectMediaId={videos[0].projectMediaId}/>
-        </div>
-        )
-      }
-      
-    </div>
-    <Timeline supabase={supabaseClient} video={videos[0]} segments={segments} setSegments={setSegments}></Timeline>
-    </div>
+          {videos.length ? <video controls className="max-h-52" ref={playerRef} src={videos.length? videos[0].url: null} width="100%"></video> :<div style={{height:"250px", width: "100%", backgroundColor:"gray"}}></div>}
+          <div className="video-set">
+            {videos.map((video) => {
+                return <VideoBlock key={uuid()} video={video} selected={true} />
+            })}
+          </div>
+		    </div>
+
+          
+        {
+        videos.length ==0 ? 
+          <></>
+        : 
+          (!videos[0].words ? 
+            <div className="flex flex-col items-center justify-center" style={{flex: 4}}>
+              <Loader />
+              <div className="text-6xl p-10">Transcribing.</div>
+              <div className="text-s text-slate-600">This could take a few moments so grab a coffee or switch tabs. We&apos;ll be here.</div>
+            </div>
+          :
+          <div style={{flex: 4, display:"flex", overflow: "hidden"}}>
+            <TextBlock supabaseClient={supabaseClient} video={videos[0]} seekVideo={seekVideo} segments={segments} setSegments={setSegments} projectMediaId={videos[0].projectMediaId} />
+            <SelectionPreview source={source} video={videos[0]} segments={segments} setSegments={setSegments} projectMediaId={videos[0].projectMediaId}/>
+          </div>
+          )
+        }
+
+      </div>
+      <Timeline supabase={supabaseClient} video={videos[0]} segments={segments} setSegments={setSegments} style={{position: "absolute", left:0, right:0, bottom:0}}></Timeline>
     </Layout>
   </>
       

@@ -2,7 +2,7 @@ import {useState} from 'react'
 
 import { observer } from 'mobx-react-lite';
 import { overlayCreator } from '@/stores/OverlayCreatorStore';
-import { over } from 'lodash';
+import TemplateModal from './templates/TemplateModal';
 /*
   This example requires some changes to your config:
   
@@ -49,39 +49,34 @@ const TemplateGrid = observer(({resolution, thumbnail}) => {
   const [files, setFiles] = useState([
     {
       title: 'No Template',
-      size: '',
       selected: true,
       source: thumbnail,
       onClick: () => {
+        if (overlayCreator.isLoading) {
+          return
+        }
         overlayCreator.template = []
         overlayCreator.applyTemplate();
       }
     },
     {
       title: 'Logo',
-      size: '3.9 MB',
       selected: false,
       source: thumbnail,
       onClick: () => {
-        const logoTemplate = [{
-          id:"174b43a2-1ab2-4954-8d38-2f289d5e6129",
-          source: "https://www.adeditor.io/logo-sans-text.png",
-          width: .2,  //Math.round(overlayCreator.preview.getSource().width * .20) + "px",
-          height: .2, //Math.round(overlayCreator.preview.getSource().width * .20) + "px",
-          track: 2,
-          x: .15, //Math.round(overlayCreator.preview.getSource().width * .15) + "px",
-          y: .15, //Math.round(overlayCreator.preview.getSource().width * .15 ) + "px",
-          type: "image",
-          fit: "fill"
-        }];
-        overlayCreator.template = logoTemplate;
-        overlayCreator.applyTemplate();
+        if (overlayCreator.isLoading) {
+          return
+        }
+        setShowModal(true);
       }
     },
   
     // More files...
   ])
+
+  const [showModal, setShowModal] = useState(false);
   return (
+    <>
     <ul role="list" className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-2 xl:gap-x-8">
       {files.map(( file, index) => (
         <li key={index} className="relative">
@@ -93,10 +88,11 @@ const TemplateGrid = observer(({resolution, thumbnail}) => {
             </button>
           </div>
           <p className="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">{file.title}</p>
-          <p className="pointer-events-none block text-sm font-medium text-gray-500">{file.size}</p>
         </li>
       ))}
     </ul>
+    {showModal ? <TemplateModal setShowModal={setShowModal} /> : <></>}
+    </>
   )
 })
 

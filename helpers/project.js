@@ -17,7 +17,6 @@ export async function createProject(supabase, userId, name = "Untitled Project")
     console.error('Error inserting data:', error.message);
     return;
   }
-  console.log("no error")
   return data
 }
 

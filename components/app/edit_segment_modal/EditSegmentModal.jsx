@@ -104,7 +104,7 @@ const Track = (props, state) => <StyledTrack {...props} index={state.index} />;
         <Button style={style}>Edit Segment</Button>
       </Dialog.Trigger>
 
-      <Dialog.Content style={{ maxWidth: 600 , height:400, display:"flex", flexDirection: "column"}}>
+      <Dialog.Content style={{ maxWidth: 600 , height:400, display:"flex", flexDirection: "column",position: "absolute"}}>
         <Dialog.Title>Edit Segment</Dialog.Title>
         <Flex justify="center" align={"center"} style={{flexGrow: 1, rowGap: "10px"}} direction='column'>
           <MyPreview  source={source}></MyPreview>

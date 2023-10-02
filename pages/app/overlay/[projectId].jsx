@@ -1,44 +1,33 @@
-import Layout from '@/components/Layout'
-import { useState, useEffect, useRef } from 'react'
 import Loader from '@/components/Loader'
+import { useEffect, useState } from 'react'
 
 import { getProjectMedia } from '@/helpers/media'
-import { getInitialSource, getProject, updateProject } from '@/helpers/project'
+import { getProject } from '@/helpers/project'
 import { getProjectSegments } from '@/helpers/segment'
 
-import { observer } from 'mobx-react-lite';
-import { overlayCreator } from '@/stores/OverlayCreatorStore';
-import OverlayCreator from '@/components/app/overlay/OverlayCreator'
 import ProcessStatus from '@/components/app/process_status/ProcessStatus'
-import { videoCreator } from '@/stores/VideoCreatorStore'
-import { createClientComponentClient, createPagesServerClient } from '@supabase/auth-helpers-nextjs'
+import { overlayCreator } from '@/stores/OverlayCreatorStore'
+import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
+import { observer } from 'mobx-react-lite'
 
 import Tooltip from '@/components/Tooltip'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
-import { Fragment } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
+
 import ResizeIcon from '@/components/Icons/ResizeIcon'
 import {
-  Bars3Icon,
-  CalendarIcon,
-  ChartPieIcon,
-  DocumentDuplicateIcon,
-  FolderIcon,
-  HomeIcon,
-  UsersIcon,
-  MapIcon,
-  XMarkIcon,
-  ChatBubbleLeftEllipsisIcon,
   ArrowUturnLeftIcon,
-  ArrowUturnRightIcon
+  ArrowUturnRightIcon,
+  ChatBubbleLeftEllipsisIcon,
+  MapIcon,
+  PauseIcon,
+  PlayIcon
 } from '@heroicons/react/24/outline'
 
 import React from "react"
-import Image from 'next/image'
-import TemplateGrid from '../../../components/app/overlay/TemplateGrid'
-import ResizeGrid from '../../../components/app/overlay/ResizeGrid'
 import ComboBox from '../../../components/ComboBox'
-import MyPreview from '../../../components/app/preview_modal/MyPreview'
+import ResizeGrid from '../../../components/app/overlay/ResizeGrid'
+import TemplateGrid from '../../../components/app/overlay/TemplateGrid'
 React.useLayoutEffect = React.useEffect 
 
 
@@ -87,6 +76,8 @@ const Overlay = observer(({projectId, projectVideos, projectSegments}) => {
   const [sidebarState, setSidebarState] = useState("Templates")
   const [resolution, setResolution] = useState([projectVideos[0].width, projectVideos[0].height]);
 
+  const supabaseClient = createClientComponentClient();
+
   const initialSource = {
     "output_format": "mp4",
     "width": getWidth(projectVideos[0].width, projectVideos[0].height, 300),
@@ -106,6 +97,13 @@ const Overlay = observer(({projectId, projectVideos, projectSegments}) => {
     })
   }
   const [source, setSource] = useState(initialSource);
+
+  useEffect(() => {
+    console.log("chnage")
+    supabaseClient.from("project").update({source: overlayCreator.preview?.source}).eq("id", projectId)
+
+  }, [overlayCreator.preview?.source])
+
 
   useEffect(() => {
     setSource(oldSource => {
@@ -171,19 +169,23 @@ const Overlay = observer(({projectId, projectVideos, projectSegments}) => {
                   <ResizeGrid originalResolution={[projectVideos[0].width, projectVideos[0].height]} setResolution={setResolution} />
                 </div>
               :
-              <></>
+              <>Coming Soon</>
             }
         </main>
 
         <div style={{flex:2}} className="bg-slate-200 overflow-y-auto border-r border-gray-200 h-full flex flex-col">
           <div className="h-10 w-full bg-white flex justify-center gap-6">
+            {!overlayCreator.isPlaying ? <PlayIcon onClick={() => {overlayCreator.preview?.play()}} className='w-6 cursor-pointer' /> 
+            :
+            <PauseIcon onClick={() => {overlayCreator.preview?.pause()}} className='w-6 cursor-pointer' /> 
+          }
             <ArrowUturnLeftIcon onClick={() => {overlayCreator.preview?.undo()}} className='w-6 cursor-pointer'/>
             <ArrowUturnRightIcon  onClick={() => {overlayCreator.preview?.redo()}} className='w-6 cursor-pointer'/>
             </div>
             <div 
               ref={(element) => {
                 if (element && element !== overlayCreator.preview?.element) {
-                  overlayCreator.initializeVideoPlayer(element, source);
+                  overlayCreator.initializeVideoPlayer(element, source, projectId);
                 }
               }}
               className="flex-1 m-5" 

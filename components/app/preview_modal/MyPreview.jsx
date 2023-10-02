@@ -32,6 +32,7 @@ export default function MyPreview ({source, className, interactive=false})  {
     // Once the SDK is ready, load a template from our project
     preview.onReady = async () => {
       //await preview.loadTemplate(process.env.NEXT_PUBLIC_TEMPLATE_ID);
+      await  preview.setLoop(false);
       await preview.setSource(source);
       setIsReady(true);
     };
@@ -62,6 +63,7 @@ export default function MyPreview ({source, className, interactive=false})  {
 
   return (
     <>
+
       <div className={className} style={{flexGrow: 1, display: isLoading? "none": null}} ref={(htmlElement) => {
             if (htmlElement && htmlElement !== previewRef.current?.element) {
               setUpPreview(htmlElement);

@@ -1,37 +1,31 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { Client, RenderOutputFormat } from 'creatomate';
 
 
-const client = new Client(process.env.CREATOMATE_API_KEY);
+import { Inngest } from 'inngest';
 
-export default function handler(req, res) {
-  return new Promise((resolve) => {
-    if (req.method === 'POST') {
-      // Return an HTTP 401 response when the API key was not provided
-      if (!process.env.CREATOMATE_API_KEY) {
-        res.status(401).end();
-        resolve();
-        return;
-      }
+const inngest = new Inngest({ name: "AdEditor" });
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+import { createClient } from '@supabase/supabase-js'
 
-      const options = {
-        // outputFormat: 'mp4' as RenderOutputFormat,
-        source: req.body.source,
-      };
 
-      client
-        .startRender(options)
-        .then((renders) => {
-          res.status(200).json(renders[0]);
-          resolve();
-        })
-        .catch(() => {
-          res.status(400).end();
-          resolve();
-        });
-    } else {
-      res.status(404).end();
-      resolve();
-    }
-  });
+export default async function handler(req, res) {
+  if (req.method === 'POST') {
+    const { source, project_id } = req.body;
+    const { data, error } = await supabase
+      .from("render")
+      .insert({ project_id: project_id, source: source, status: "rendering" })
+      .select()
+    inngest.send({
+      name: "render/video",
+      data: {
+        source: source,
+        projectId: project_id,
+        renderId: data[0].id
+      },
+    });
+
+    res.status(200).json({ renderId: data[0].id })
+    //res.status(200).body().end();
+  } else {
+    res.status(404).end();
+  }
 }

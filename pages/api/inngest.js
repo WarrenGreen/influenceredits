@@ -8,13 +8,18 @@ import { createTranscript } from '@/db/transcript'
 export const inngest = new Inngest({ name: "AdEditor" });
 import { createClient } from '@supabase/supabase-js'
 import { updateMedia } from "../../helpers/media";
+import { finishVideo } from "../../helpers/finishVideo";
 
 const ffmpegStatic = require('ffmpeg-static');
 const ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegStatic);
 
-// Use a custom domain as the supabase URL
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+
+import { Client, RenderOutputFormat } from 'creatomate';
+
+
+const client = new Client(process.env.CREATOMATE_API_KEY);
 
 
 const videoUpload = inngest.createFunction(
@@ -58,7 +63,46 @@ const videoUpload = inngest.createFunction(
   }
 );
 
+
+const renderVideo = inngest.createFunction(
+  { name: "Render Video" },
+  { event: "render/video" },
+  async ({ event, step }) => {
+    const source = event.data.source
+    const projectId = event.data.projectId
+    const renderId = event.data.renderId
+
+    console.log("render id: " + renderId)
+
+    if (!process.env.CREATOMATE_API_KEY) {
+      res.status(401).end();
+      resolve();
+      return;
+    }
+
+    const options = {
+      // outputFormat: 'mp4' as RenderOutputFormat,
+      source: source,
+    };
+
+    const renderResult = await client.render(options)
+
+    console.log(renderResult)
+
+    const { data, error } = await supabase
+      .from("render")
+      .update({ url: renderResult[0].url, status: "complete" })
+      .eq("id", renderId)
+      .select()
+
+    console.log(data)
+    console.log(error)
+    return { event, body: { renderResult: renderResult } };
+  }
+);
+
 // Create an API that serves zero functions
 export default serve(inngest, [
   videoUpload,
+  renderVideo
 ]);

@@ -11,7 +11,7 @@
   "dependencies": {
     "@auth/core": "^0.14.0",
     "@auth/prisma-adapter": "^1.0.2",
-    "@creatomate/preview": "^1.1.1",
+    "@creatomate/preview": "^1.2.0",
     "@headlessui/react": "^1.7.17",
     "@headlessui/tailwindcss": "^0.2.0",
     "@heroicons/react": "^2.0.18",
