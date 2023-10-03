@@ -23,7 +23,7 @@ export function Footer() {
             
           </div>
           <p className="mt-6 text-sm text-slate-500 sm:mt-0">
-            Copyright &copy; {new Date().getFullYear()} TaxPal. All rights
+            Copyright &copy; {new Date().getFullYear()} AdEditor. All rights
             reserved.
           </p>
         </div>
