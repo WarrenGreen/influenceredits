@@ -220,7 +220,7 @@ export default function Editor({initialSession, user, projectVideos, projectSegm
       :
       <>
         {user ? <SessionHeader />  : <Header />}
-        <div>We&lsquore sorry, this app is only for big screens. Please come back on a desktop.</div>
+        <div>Were sorry, this app is only for big screens. Please come back on a desktop.</div>
         </>
       }
       </Layout>
