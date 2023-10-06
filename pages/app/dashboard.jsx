@@ -12,6 +12,7 @@ import AppHeader from '@/components/app/Header'
 import ProjectList from '@/components/app/dashboard/ProjectList'
 React.useLayoutEffect = React.useEffect 
 
+import { useMediaQuery } from 'react-responsive'
 
 
 export const getServerSideProps = async (context) => {
@@ -50,13 +51,23 @@ export const getServerSideProps = async (context) => {
 export default function Dashboard({projects}) {
 
   const [showModal, setShowModal] = useState(false);
+
+  const isDesktop = useMediaQuery({
+    query: '(min-width: 640px)'
+  })
   
   return (
     <>
       <AppHeader >
-        <ProjectList createNewProject={()=>{setShowModal(true)}} projects={projects} />
+      {isDesktop ? 
+      <ProjectList createNewProject={()=>{setShowModal(true)}} projects={projects} />
+      :
+      <div>We're sorry, this app is only for big screens. Please come back on a desktop.</div>
+        
+      }
       </AppHeader>
       {showModal? <UploadModal setShowModal={setShowModal}/>:<></>}
+      
     </>
   )
 }

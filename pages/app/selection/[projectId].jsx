@@ -16,6 +16,12 @@ import SelectionPreview from '@/components/app/selection/SelectionPreview'
 import { v4 as uuid } from 'uuid'
 import { PencilSquareIcon, XCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
 import { createClientComponentClient, createPagesServerClient } from '@supabase/auth-helpers-nextjs'
+import { Header } from '@/components/Header'
+import {SessionHeader} from '@/components/SessionHeader'
+
+
+import { useMediaQuery } from 'react-responsive'
+
 
 import React from "react"
 React.useLayoutEffect = React.useEffect 
@@ -150,11 +156,16 @@ export default function Editor({initialSession, user, projectVideos, projectSegm
   }
 
   const [editingProjectName, setEditingProjectName] = useState(false)
-
+  const isDesktop = useMediaQuery({
+    query: '(min-width: 640px)'
+  })
   return (
     <>
     <Layout>
+    {isDesktop ? 
+        <>
         <ProcessStatus state="select" projectId={projectId} style={{top:"0", position:"absolute", height: "3.5rem"}} />
+        
       <div className='flex' style={{position: "absolute", top: "3rem", left: 0, right: 0, bottom:"3.5rem"}} width="100%">
         <div className="sidebar"> 
           <div className='m-2 font-bold flex items-center justify-between'>
@@ -205,7 +216,14 @@ export default function Editor({initialSession, user, projectVideos, projectSegm
 
       </div>
       <Timeline supabase={supabaseClient} video={videos[0]} segments={segments} setSegments={setSegments} style={{position: "absolute", left:0, right:0, bottom:0}}></Timeline>
-    </Layout>
+       </> 
+      :
+      <>
+        {user ? <SessionHeader />  : <Header />}
+        <div>We're sorry, this app is only for big screens. Please come back on a desktop.</div>
+        </>
+      }
+      </Layout>
   </>
       
   )

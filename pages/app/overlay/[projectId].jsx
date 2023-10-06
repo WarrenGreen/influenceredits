@@ -13,6 +13,10 @@ import { observer } from 'mobx-react-lite'
 import Tooltip from '@/components/Tooltip'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
+import { useMediaQuery } from 'react-responsive'
+import { Header } from '@/components/Header'
+import {SessionHeader} from '@/components/SessionHeader'
+
 
 import ResizeIcon from '@/components/Icons/ResizeIcon'
 import {
@@ -72,7 +76,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-const Overlay = observer(({projectId, projectVideos, projectSegments}) => {
+const Overlay = observer(({projectId, projectVideos, projectSegments, user}) => {
   const [sidebarState, setSidebarState] = useState("Templates")
   const [resolution, setResolution] = useState([projectVideos[0].width, projectVideos[0].height]);
 
@@ -124,7 +128,13 @@ const Overlay = observer(({projectId, projectVideos, projectSegments}) => {
     { name: 'Resize', onClick:()=>setSidebarState("Resize"), icon: ResizeIcon },
   ]
 
+  const isDesktop = useMediaQuery({
+    query: '(min-width: 640px)'
+  })
+
   return (
+    <>
+    { isDesktop ?
     <div className='flex flex-col h-full'>
       {/*
         This example requires updating your template:
@@ -195,6 +205,13 @@ const Overlay = observer(({projectId, projectVideos, projectSegments}) => {
         </div>
       </div>
     </div>
+    :
+    <>
+        {user ? <SessionHeader />  : <Header />}
+        <div>We're sorry, this app is only for big screens. Please come back on a desktop.</div>
+        </>
+            }
+            </>
   )
 })
 
