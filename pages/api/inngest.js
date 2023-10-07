@@ -89,13 +89,47 @@ const renderVideo = inngest.createFunction(
       source: source,
     };
 
-    const renderResult = await client.render(options)
+    let renderResult = await client.startRender(options)
+    await inngest.send({
+      name: "render/retrieve",
+      data: {
+        "renderId": renderId,
+        "creatomateRenderId": renderResult[0].id
+      },
+    });
+    return { event, body: { renderResult: renderResult } };
+  }
+);
 
+
+const retrieveRender = inngest.createFunction(
+  {
+    name: "Retrieve Render",
+    retries: 1000,
+  },
+  { event: "render/retrieve" },
+  async ({ event, step }) => {
+    const renderId = event.data.renderId
+    const creatomateRenderId = event.data.creatomateRenderId
+
+    console.log("render id: " + renderId)
+
+    if (!process.env.CREATOMATE_API_KEY) {
+      res.status(401).end();
+      resolve();
+      return;
+    }
+
+    const renderResult = await client.fetchRender(creatomateRenderId)
     console.log(renderResult)
+
+    if (renderResult.status != "succeeded") {
+      throw new Error("Render: " + creatomateRenderId + " is status: " + renderResult.status);
+    }
 
     const { data, error } = await supabase
       .from("render")
-      .update({ url: renderResult[0].url, status: "complete" })
+      .update({ url: renderResult.url, status: "complete" })
       .eq("id", renderId)
       .select()
 
@@ -105,8 +139,10 @@ const renderVideo = inngest.createFunction(
   }
 );
 
+
 // Create an API that serves zero functions
 export default serve(inngest, [
   videoUpload,
-  renderVideo
+  renderVideo,
+  retrieveRender
 ]);
