@@ -32,6 +32,7 @@ import React from "react"
 import ComboBox from '../../../components/ComboBox'
 import ResizeGrid from '../../../components/app/overlay/ResizeGrid'
 import TemplateGrid from '../../../components/app/overlay/TemplateGrid'
+import SubtitlesProperties from '../../../components/app/overlay/SubtitlesProperties'
 React.useLayoutEffect = React.useEffect 
 
 
@@ -133,9 +134,9 @@ const Overlay = observer(({projectId, projectVideos, projectSegments, user}) => 
   })
 
   return (
-    <>
-    { isDesktop ?
     <div className='flex flex-col h-full'>
+
+    <>
       {/*
         This example requires updating your template:
 
@@ -179,9 +180,10 @@ const Overlay = observer(({projectId, projectVideos, projectSegments, user}) => 
                   <ResizeGrid originalResolution={[projectVideos[0].width, projectVideos[0].height]} setResolution={setResolution} />
                 </div>
               :
-              <>Coming Soon</>
+              <SubtitlesProperties />
             }
         </main>
+
 
         <div style={{flex:2}} className="bg-slate-200 overflow-y-auto border-r border-gray-200 h-full flex flex-col">
           <div className="h-10 w-full bg-white flex justify-center gap-6">
@@ -204,14 +206,8 @@ const Overlay = observer(({projectId, projectVideos, projectSegments, user}) => 
             {(overlayCreator.isLoading) && <div className="flex flex-col w-full h-full justify-center items-center"><Loader /><div>Your preview is loading...</div></div>}
         </div>
       </div>
-    </div>
-    :
-    <>
-        {user ? <SessionHeader />  : <Header />}
-        <div>Were sorry, this app is only for big screens. Please come back on a desktop.</div>
-        </>
-            }
-            </>
+    </>
+      </div>
   )
 })
 
