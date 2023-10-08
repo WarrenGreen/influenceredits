@@ -8,6 +8,7 @@ import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import LoaderPage from '@/components/LoaderPage'
+import ReactGA from "react-ga4";
 
 
 export const inter = Inter({
@@ -46,6 +47,7 @@ function MyApp({ Component, pageProps }) {
     }
   }, [router.events])
 
+  ReactGA.initialize("G-CJ5TKMZDY3");
   return (
     <SessionContextProvider
       supabaseClient={supabaseClient}
