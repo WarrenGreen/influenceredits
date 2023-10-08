@@ -30,7 +30,7 @@ export default function Register() {
           href="/login"
           className="font-medium text-purple-600 hover:underline"
         >
-          Sign in
+          Sign in 
         </Link>
         to your account.
       </p>

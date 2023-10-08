@@ -59,12 +59,7 @@ export default function Dashboard({projects}) {
   return (
     <>
       <AppHeader >
-      {isDesktop ? 
       <ProjectList createNewProject={()=>{setShowModal(true)}} projects={projects} />
-      :
-      <div>Were sorry, this app is only for big screens. Please come back on a desktop.</div>
-        
-      }
       </AppHeader>
       {showModal? <UploadModal setShowModal={setShowModal}/>:<></>}
       

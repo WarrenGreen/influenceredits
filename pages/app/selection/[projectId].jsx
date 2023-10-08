@@ -162,7 +162,6 @@ export default function Editor({initialSession, user, projectVideos, projectSegm
   return (
     <>
     <Layout>
-    {isDesktop ? 
         <>
         <ProcessStatus state="select" projectId={projectId} style={{top:"0", position:"absolute", height: "3.5rem"}} />
         
@@ -217,12 +216,6 @@ export default function Editor({initialSession, user, projectVideos, projectSegm
       </div>
       <Timeline supabase={supabaseClient} video={videos[0]} segments={segments} setSegments={setSegments} style={{position: "absolute", left:0, right:0, bottom:0}}></Timeline>
        </> 
-      :
-      <>
-        {user ? <SessionHeader />  : <Header />}
-        <div>Were sorry, this app is only for big screens. Please come back on a desktop.</div>
-        </>
-      }
       </Layout>
   </>
       
