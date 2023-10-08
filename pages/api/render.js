@@ -17,7 +17,7 @@ export default async function handler(req, res) {
 
     console.log("send inngest render")
     console.log(data)
-    inngest.send({
+    await inngest.send({
       name: "render/video",
       data: {
         source: source,
