@@ -14,6 +14,9 @@ export default async function handler(req, res) {
       .from("render")
       .insert({ project_id: project_id, source: source, status: "rendering" })
       .select()
+
+    console.log("send inngest render")
+    console.log(data)
     inngest.send({
       name: "render/video",
       data: {
