@@ -9,6 +9,7 @@ import { PrimaryFeatures } from '@/components/PrimaryFeatures'
 import { SecondaryFeatures } from '@/components/SecondaryFeatures'
 import { Testimonials } from '@/components/Testimonials'
 import {useSession} from '@supabase/auth-helpers-react';
+import VideoModal from '../components/VideoModal'
 
 export default function Home() {
   const user = useSession();

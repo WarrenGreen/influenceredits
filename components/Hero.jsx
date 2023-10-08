@@ -2,10 +2,17 @@ import Image from 'next/image'
 
 import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
+import VideoModal from './VideoModal'
+import {useState} from 'react'
 
 export function Hero() {
+
+  const [showModal, setShowModal] = useState(false)
+
   return (
     <Container className="pb-16 pt-20 text-center lg:pt-32">
+    {showModal ? <VideoModal setShowModal={setShowModal} videoUrl={"https://files.movio.la/movio/video/74a43ade317a4f97848ea3cc2d6876dd/caption.mp4?Expires=1697325847&Signature=Y2uhk8T-5Stm8JZE-rmR5XS6goDREl12DVg7USpJacOm8JmDJerYFqe4aL6Jb9uEeb0uHPKFx-IzgZ5H6q8cureatj9RReontlSxQLIa2pJn7IRYQokD0kpOKYEzFh70MXljSeOLNsPOwgsu5CqH4lm67nm7~CeddD5cXirSIXvIifCYrOrkG8JjIOvTK2MIQ5XCY2wHj5wT0aFZ0~RVs2-BgXvS3DTxD-fp6hJOHDTx5~4BQ8SOOu8oGne3o4~GacVBxmuNzhP1dmaIwqExXnyztdUvAM2F6qs-RfKGhG0yJCPlo7RSPFkT0FnGFgcsHLeEm2-W1Fh0DDj4W1Zxtg__&Key-Pair-Id=K49TZTO9GZI6K"} /> : <></>}
+
       <h1 className="mx-auto max-w-4xl font-display text-5xl font-medium tracking-tight text-slate-900 sm:text-7xl">
         Ad creation{' '}
         <span className="relative whitespace-nowrap text-purple-600">
@@ -25,19 +32,14 @@ export function Hero() {
         Data driven marketing requires heaps of assets. AI powered tools make it easy to reuse UGC, testimonials and user stories.
       </p>
       <div className="mt-10 flex justify-center gap-x-6">
-        <Button href="/register">Try it now</Button>
-        {/*<Button
-          href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-          variant="outline"
+        <Button style={{height: "3rem"}} href="/register">Try it now</Button>
+        <div
+          className="flex flex-col cursor-pointer"
+          onClick={()=>{setShowModal(true)}}
         >
-          <svg
-            aria-hidden="true"
-            className="h-3 w-3 flex-none fill-purple-600 group-active:fill-current"
-          >
-            <path d="m9.997 6.91-7.583 3.447A1 1 0 0 1 1 9.447V2.553a1 1 0 0 1 1.414-.91L9.997 5.09c.782.355.782 1.465 0 1.82Z" />
-          </svg>
+          <img style={{width: "9rem"}} src="/images/explainer.png"/>
           <span className="ml-3">Watch video</span>
-  </Button>*/}
+  </div>
       </div>
       <div className="mt-36 lg:mt-44">
         <p className="font-display text-base text-slate-900">
@@ -65,5 +67,6 @@ export function Hero() {
         </ul>
       </div>
     </Container>
+
   )
 }
