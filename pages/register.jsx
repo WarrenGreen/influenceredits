@@ -35,12 +35,12 @@ export default function Register() {
         to your account.
       </p>
       <Auth
-        redirectTo="https://adeditor.io/api/auth/callback"
         appearance={{ theme: ThemeSupa }}
         supabaseClient={supabaseClient}
         providers={['google']}
         socialLayout="horizontal"
         onlyThirdPartyProviders={true}
+        redirectTo='https://adeditor.io/api/auth/new_user'
       />
     </SlimLayout>
   )

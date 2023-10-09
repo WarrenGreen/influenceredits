@@ -8,7 +8,7 @@ const handler = async (req, res) => {
   }
   console.log("authed")
 
-  res.redirect('/new_user')
+  res.redirect('/app/dashboard')
 }
 
 export default handler
