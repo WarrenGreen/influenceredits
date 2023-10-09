@@ -9,6 +9,7 @@ export const inngest = new Inngest({ name: "AdEditor" });
 import { createClient } from '@supabase/supabase-js'
 import { updateMedia } from "../../helpers/media";
 import { finishVideo } from "../../helpers/finishVideo";
+const ffprobe = require('ffprobe')
 
 const ffmpegStatic = require('ffmpeg-static');
 const ffmpeg = require('fluent-ffmpeg');
@@ -34,7 +35,7 @@ const videoUpload = inngest.createFunction(
     let videoWidth = null;
     let videoHeight = null;
 
-    ffmpeg.ffprobe(event.data.video.url, async function (err, metadata) {
+    ffprobe(event.data.video.url, async function (err, metadata) {
       if (err) {
         console.error(err)
       } else {
