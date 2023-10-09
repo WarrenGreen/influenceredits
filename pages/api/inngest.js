@@ -35,7 +35,9 @@ const videoUpload = inngest.createFunction(
     let videoWidth = null;
     let videoHeight = null;
 
-    ffprobe(event.data.video.url, async function (err, metadata) {
+    console.log(event.data.video.url)
+
+    ffprobe(event.data.video.url, null, async function (err, metadata) {
       if (err) {
         console.error(err)
       } else {
