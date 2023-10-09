@@ -10,6 +10,7 @@ import { createClient } from '@supabase/supabase-js'
 import { updateMedia } from "../../helpers/media";
 import { finishVideo } from "../../helpers/finishVideo";
 const ffprobe = require('ffprobe')
+const ffprobeStatic = require('ffprobe-static');
 
 const ffmpegStatic = require('ffmpeg-static');
 const ffmpeg = require('fluent-ffmpeg');
@@ -35,37 +36,46 @@ const videoUpload = inngest.createFunction(
     let videoWidth = null;
     let videoHeight = null;
 
-    console.log(event.data.video.url)
+    console.log("Video url: " + event.data.video.url)
 
-    ffprobe(event.data.video.url, null, async function (err, metadata) {
-      if (err) {
-        console.error(err)
-      } else {
-        console.log(metadata.format.duration);
-        console.log(metadata.streams[0].width)
-        metadata.streams.map((stream) => {
-          if (stream.width && stream.height) {
-            videoWidth = stream.width;
-            videoHeight = stream.height;
-          }
-        })
+    var promise = new Promise((resolve, reject) => {
+      ffprobe(event.data.video.url, { path: ffprobeStatic.path }, async function (err, metadata) {
+        if (err) {
+          console.error(err)
+          reject()
+        } else {
+          metadata.streams.map((stream) => {
+            if (stream.width && stream.height) {
+              videoWidth = stream.width;
+              videoHeight = stream.height;
+            }
+          })
 
-        if (!videoWidth || !videoHeight)
-          throw Error("No dimensions found for video")
+          if (!videoWidth || !videoHeight)
+            throw Error("No dimensions found for video")
 
-        let thumbnailUrl = (await requestThumbnail(event.data.video.url, videoWidth, videoHeight))[0].url
-        let video = await addThumbnail(supabase, event.data.video.id, thumbnailUrl)
-        video.width = videoWidth;
-        video.height = videoHeight;
-        video = updateMedia(supabase, video)
+          let thumbnailUrl = (await requestThumbnail(event.data.video.url, videoWidth, videoHeight))[0].url
+          let video = await addThumbnail(supabase, event.data.video.id, thumbnailUrl)
+          video.width = videoWidth;
+          video.height = videoHeight;
+          video = await updateMedia(supabase, video)
 
-        let transcribedWords = await requestTranscription({ "uploadUrl": event.data.video.url });
-        let transcript = await createTranscript(supabase, event.data.video.projectMediaId, transcribedWords.text, JSON.stringify(transcribedWords.words))
 
-        return { event, body: { video: video, transcript: transcript } };
+          let transcribedWords = await requestTranscription({ "uploadUrl": event.data.video.url });
+          let transcript = await createTranscript(supabase, event.data.video.projectMediaId, transcribedWords.text, JSON.stringify(transcribedWords.words))
 
-      }
-    });
+          resolve([video, transcript])
+          //return { event, body: { video: video, transcript: transcript } };
+
+        }
+      });
+    })
+
+    const [video, transcript] = await promise;
+
+    return { event, body: { video: video, transcript: transcript } };
+
+
 
   }
 );
