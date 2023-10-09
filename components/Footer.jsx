@@ -26,6 +26,7 @@ export function Footer() {
             Copyright &copy; {new Date().getFullYear()} AdEditor. All rights
             reserved.
           </p>
+          <a className="mt-6 text-sm text-slate-500 sm:mt-0" href="/privacy-policy.html">Privacy Policy</a>
         </div>
       </Container>
     </footer>
