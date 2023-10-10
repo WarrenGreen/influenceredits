@@ -31,7 +31,7 @@ export const getServerSideProps = async (context) => {
     const {data: mediaData, error: mediaError}  = await supabase
       .from("media")
       .insert([
-        {'name': 'Trying Press On Nails by GLAMNETIC ', 'url': 'https://influencer-edits.s3.amazonaws.com/videos/9d97a6bf-5212-4587-9cda-30c328b82106.mp4', 'thumbnail': 'https://cdn.creatomate.com/renders/bebc48f5-dec8-49e1-88e5-00099a5941b5.jpg', 'width': '1280', 'height': '720', 'user_id': user.id}
+        {'name': 'Trying Press On Nails by GLAMNETIC', 'url': 'https://influencer-edits.s3.amazonaws.com/videos/9d97a6bf-5212-4587-9cda-30c328b82106.mp4', 'thumbnail': 'https://cdn.creatomate.com/renders/bebc48f5-dec8-49e1-88e5-00099a5941b5.jpg', 'width': '1280', 'height': '720', 'user_id': user.id}
       ])
       .select()
       .single()
@@ -40,7 +40,7 @@ export const getServerSideProps = async (context) => {
       .from('project_media')
       .insert([
         {
-          name: "Trying press on nails",
+          name: 'Trying press on nails',
           media_id: mediaData.id,
           project_id: newProject.id,
         },

@@ -40,7 +40,6 @@ export default function Register() {
         providers={['google']}
         socialLayout="horizontal"
         onlyThirdPartyProviders={true}
-        redirectTo='https://adeditor.io/api/auth/new_user'
       />
     </SlimLayout>
   )
