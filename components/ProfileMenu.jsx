@@ -17,6 +17,7 @@ export default function ProfileMenu() {
   const [userData, setUserData] = useState({name: '', email: '', imageUrl: ''})
 
   useEffect(() => {
+    if (user){
   supabase
     .from("user")
     .select()
@@ -25,6 +26,7 @@ export default function ProfileMenu() {
     .then(({data}) => {
       setUserData({name: data.name, email:data.email, imageUrl: data.image_url})
     })
+  }
   } , [user])
 
 
