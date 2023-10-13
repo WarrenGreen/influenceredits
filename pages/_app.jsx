@@ -55,8 +55,8 @@ function MyApp({ Component, pageProps }) {
       initialSession={pageProps.initialSession}
     >
       <main className={`${inter.variable} font-sans ${lexend.variable}`} style={{height: "100%"}}>
-      <Script async src="https://www.googletagmanager.com/gtag/js?id=AW-11370530041"></Script>
-        <Script dangerouslySetInnerHTML={{
+      <Script id="google ads script 1" async src="https://www.googletagmanager.com/gtag/js?id=AW-11370530041"></Script>
+        <Script id="google ads script 2" dangerouslySetInnerHTML={{
           __html:`
           window.dataLayer = window.dataLayer || [];
           (function gtag(){dataLayer.push(arguments)});
