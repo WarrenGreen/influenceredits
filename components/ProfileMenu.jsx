@@ -18,15 +18,15 @@ export default function ProfileMenu() {
 
   useEffect(() => {
     if (user){
-  supabase
-    .from("user")
-    .select()
-    .single()
-    .eq("id", user.id)
-    .then(({data}) => {
-      setUserData({name: data.name, email:data.email, imageUrl: data.image_url})
-    })
-  }
+      supabase
+        .from("user")
+        .select()
+        .single()
+        .eq("id", user.id)
+        .then(({data}) => {
+          setUserData({name: data.name, email:data.email, imageUrl: data.image_url})
+        })
+    }
   } , [user])
 
 
