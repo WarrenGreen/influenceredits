@@ -20,9 +20,10 @@ export default function Home() {
       <main>
         <Hero />
         <PrimaryFeatures />
-        <CallToAction />
         {/*<Testimonials />*/}
         <Pricing />
+        <CallToAction />
+
       </main>
       <Footer />
     </>
