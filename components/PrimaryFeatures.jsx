@@ -10,7 +10,7 @@ const backgroundImage = '/images/background-features.jpg'
 const screenshotExpenses = '/images/screenshots/expenses.png'
 const screenshotSelection = '/images/screenshots/selection.png'
 const screenshotScript = '/images/screenshots/script-editing.png'
-const screenshotPayroll = 'images/screenshots/payroll.png'
+const screenshotAIWriter = '/images/screenshots/ai-scripts.png'
 const screenshotReporting = '/images/screenshots/reporting.png'
 const screenshotScaling = '/images/screenshots/scaling.png'
 
@@ -33,6 +33,11 @@ const features = [
       "Quickly select any ad platform and resize your content to fit.",
     image: screenshotScaling,
   },
+  {
+    title: 'AI Generate script variations ⚡ (beta)',
+    description: 'Our AI will automatically generate loads of scripts that fit your brand.',
+    image: screenshotAIWriter
+  }
 ]
 
 export function PrimaryFeatures() {
