@@ -24,6 +24,7 @@ import { useMediaQuery } from 'react-responsive'
 
 
 import React from "react"
+import MobileWarningModal from '../../../components/app/MobileWarningModal'
 React.useLayoutEffect = React.useEffect 
 
 export const getServerSideProps = async (context) => {
@@ -161,7 +162,10 @@ export default function Editor({initialSession, user, projectVideos, projectSegm
   })
   return (
     <>
+    <MobileWarningModal style={{display: isDesktop ? "none" : ""}}/>
+
     <Layout>
+
         <>
         <ProcessStatus state="select" projectId={projectId} style={{top:"0", position:"absolute", height: "3.5rem"}} />
         
