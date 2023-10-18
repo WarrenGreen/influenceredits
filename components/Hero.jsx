@@ -11,7 +11,7 @@ export function Hero() {
 
   return (
     <Container className="pb-16 pt-20 text-center lg:pt-32">
-    {showModal ? <VideoModal setShowModal={setShowModal} videoUrl={"https://files.movio.la/movio/video/74a43ade317a4f97848ea3cc2d6876dd/caption.mp4?Expires=1697325847&Signature=Y2uhk8T-5Stm8JZE-rmR5XS6goDREl12DVg7USpJacOm8JmDJerYFqe4aL6Jb9uEeb0uHPKFx-IzgZ5H6q8cureatj9RReontlSxQLIa2pJn7IRYQokD0kpOKYEzFh70MXljSeOLNsPOwgsu5CqH4lm67nm7~CeddD5cXirSIXvIifCYrOrkG8JjIOvTK2MIQ5XCY2wHj5wT0aFZ0~RVs2-BgXvS3DTxD-fp6hJOHDTx5~4BQ8SOOu8oGne3o4~GacVBxmuNzhP1dmaIwqExXnyztdUvAM2F6qs-RfKGhG0yJCPlo7RSPFkT0FnGFgcsHLeEm2-W1Fh0DDj4W1Zxtg__&Key-Pair-Id=K49TZTO9GZI6K"} /> : <></>}
+    {showModal ? <VideoModal setShowModal={setShowModal} videoUrl={"/demo.mp4"} /> : <></>}
 
       <h1 className="mx-auto max-w-4xl font-display text-5xl font-medium tracking-tight text-slate-900 sm:text-7xl">
         Ad creation{' '}
