@@ -162,7 +162,7 @@ export default function Editor({initialSession, user, projectVideos, projectSegm
   })
   return (
     <>
-    <MobileWarningModal style={{display: isDesktop ? "none" : ""}}/>
+    {/*<MobileWarningModal style={{display: isDesktop ? "none" : ""}}/>*/}
 
     <Layout>
 
